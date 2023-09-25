@@ -172,8 +172,8 @@ exports.deleteDataset = async (req, res, next) => {
 };
 
 exports.getReply = async (req, res, next) => {
-  console.log("req----", req);
-  const { prompt } = req.body;
+  
+  console.log("param---", req);
 
   const client = new PineconeClient();
   await client.init({
@@ -215,7 +215,7 @@ exports.getReply = async (req, res, next) => {
     }
   );
   const result = await chain.call({
-    question: prompt,
+    question: params,
     chat_history: [],
   });
 
