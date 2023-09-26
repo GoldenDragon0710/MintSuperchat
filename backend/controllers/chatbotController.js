@@ -351,7 +351,7 @@ async function deleteRows(id) {
 async function trainingFromLinks(links) {
   if (links.length) {
     await Promise.all(
-      links.map(async (link, idx) => {
+      links.map(async (link) => {
         try {
           const dbData = await insertRow(link);
           const docs = await createVectorStore_link(

@@ -179,6 +179,24 @@ export function SitemapsTab(props) {
 
   return (
     <>
+      <div className="m-1 flex w-full justify-end">
+        <a
+          href={"public/templates/sitemap.csv"}
+          download="Sitemap_template"
+          target="_blank"
+          rel="noreferrer"
+        >
+          <div className="flex cursor-pointer items-center">
+            <Avatar
+              src="img/download.svg"
+              className="m-2 h-auto w-[16px] rounded-none"
+            />
+            <Typography color="black" className="text-[16px] font-semibold">
+              Template
+            </Typography>
+          </div>
+        </a>
+      </div>
       <div className="flex w-full items-center justify-center">
         <label
           htmlFor="dropzone-file2"
