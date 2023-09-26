@@ -16,6 +16,8 @@ const { CSVLoader } = require("langchain/document_loaders/fs/csv");
 const xlsx = require("xlsx");
 const { Document } = require("langchain/document");
 const Papa = require("papaparse");
+const fs = require("fs");
+const path = require("path");
 const twilio = require("twilio");
 require("dotenv").config();
 
@@ -80,14 +82,19 @@ exports.training_files = async (req, res, next) => {
             dbData._id.toString()
           );
           await storeVectorData(docs);
-          const rows = await getAllRows();
-          return res.json({ data: rows });
+          const uploadFolderPath = path.join(__dirname, "../uploads");
+          const directoryPath = uploadFolderPath + "/" + file.filename;
+          fs.unlink(directoryPath, (err) => {
+            if (err) throw err;
+          });
         } catch (err) {
           console.log(err);
           return res.status(500).json({ message: "Internal server error" });
         }
       })
     );
+    const rows = await getAllRows();
+    return res.json({ data: rows });
   } else {
     return res.status(500).json({ message: "No file is selected." });
   }
@@ -135,8 +142,11 @@ exports.training_FAQs = async (req, res, next) => {
             dbData._id.toString()
           );
           await storeVectorData(docs);
-          const rows = await getAllRows();
-          return res.json({ data: rows });
+          const uploadFolderPath = path.join(__dirname, "../uploads");
+          const directoryPath = uploadFolderPath + "/" + file.filename;
+          fs.unlink(directoryPath, (err) => {
+            if (err) throw err;
+          });
         } catch (err) {
           console.log(err);
           // throw err;
@@ -144,6 +154,8 @@ exports.training_FAQs = async (req, res, next) => {
         }
       })
     );
+    const rows = await getAllRows();
+    return res.json({ data: rows });
   } else {
     return res.status(500).json({ message: "No file is selected." });
   }
@@ -174,7 +186,6 @@ exports.deleteDataset = async (req, res, next) => {
 
 exports.getReply = async (req, res, next) => {
   const message = req.body.Body;
-  console.log("param---", message);
 
   const client = new PineconeClient();
   await client.init({
@@ -215,18 +226,17 @@ exports.getReply = async (req, res, next) => {
       returnSourceDocuments: true,
     }
   );
-  
+
   const result = await chain.call({
     question: message,
     chat_history: [],
   });
-  console.log("rsult---", result.text);
   try {
     const twiml = new twilio.twiml.MessagingResponse();
     twiml.message(result.text);
     res.send(twiml.toString());
-  } catch {
-    console.log("error", err);
+  } catch (err) {
+    console.log(err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -344,7 +354,7 @@ async function trainingFromLinks(links) {
       links.map(async (link, idx) => {
         try {
           const dbData = await insertRow(link);
-	  const docs = await createVectorStore_link(
+          const docs = await createVectorStore_link(
             link,
             dbData._id.toString()
           );
@@ -386,23 +396,11 @@ async function createVectorStore_link(link, id) {
 }
 
 async function detectingCSV(file) {
-  await new Promise((resolve, reject) => {
-    Papa.parse(file, {
-      download: true,
-      header: true,
-      skipEmptyLines: true,
-      complete: (result) => {
-        if (result.data.length != 0) {
-          return result.data;
-        }
-        resolve();
-      },
-      error: (err) => {
-        console.log(err);
-        reject(err);
-      },
-    });
-  });
+  const uploadFolderPath = path.join(__dirname, "../uploads");
+  const directoryPath = uploadFolderPath + "/" + file.filename;
+  const fileData = fs.readFileSync(directoryPath, "utf8");
+  const result = Papa.parse(fileData, { header: true });
+  return result.data;
 }
 
 async function createVectorStore_JSON(JSONData, id) {

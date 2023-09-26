@@ -118,16 +118,7 @@ export function Home() {
                         onClick={() => handleDeleteDataset(item._id)}
                         className="flex h-8 w-8 items-center justify-center p-0"
                       >
-                        {loading ? (
-                          <ClipLoader
-                            color={"#000000"}
-                            loading={loading}
-                            size={13}
-                            cssOverride={{ height: "25px", width: "25px" }}
-                          />
-                        ) : (
-                          <TrashIcon className="w-6" color="black" />
-                        )}
+                        <TrashIcon className="w-6" color="black" />
                       </Button>
                     </div>
                   );
@@ -135,6 +126,18 @@ export function Home() {
             </div>
           </div>
         </div>
+        {loading && (
+          <div className="absolute top-0 z-20 h-full w-full bg-blue-gray-200 bg-opacity-80">
+            <div className="flex h-full w-full items-center justify-center">
+              <ClipLoader
+                color={"#000000"}
+                loading={loading}
+                size={20}
+                cssOverride={{ height: "100px", width: "100px" }}
+              />
+            </div>
+          </div>
+        )}
       </div>
     </>
   );

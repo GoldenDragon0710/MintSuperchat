@@ -14,7 +14,6 @@ export function FAQsTabs(props) {
     setLoading(true);
     let samefiles = 0;
     const formData = new FormData();
-    console.log(fileList);
     if (fileNameList.length != 0) {
       for (let i = 0; i < fileList.length; i++) {
         if (props.dataset.includes(fileList[i].name) == false) {
@@ -37,7 +36,7 @@ export function FAQsTabs(props) {
       })
       .catch((err) => {
         console.log(err);
-        notification.success({ message: err.response.data.message });
+        notification.error({ message: err.response.data.message });
         setLoading(false);
       });
   };
