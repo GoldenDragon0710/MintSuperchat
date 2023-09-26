@@ -15,7 +15,7 @@ const { TextLoader } = require("langchain/document_loaders/fs/text");
 const { CSVLoader } = require("langchain/document_loaders/fs/csv");
 const xlsx = require("xlsx");
 const { Document } = require("langchain/document");
-const { Papa } = require("papaparse");
+const Papa = require("papaparse");
 const twilio = require("twilio");
 require("dotenv").config();
 
@@ -123,6 +123,7 @@ exports.training_sitemap = async (req, res, next) => {
 
 exports.training_FAQs = async (req, res, next) => {
   const files = req.files;
+
   if (files) {
     await Promise.all(
       files.map(async (file) => {
@@ -172,8 +173,8 @@ exports.deleteDataset = async (req, res, next) => {
 };
 
 exports.getReply = async (req, res, next) => {
-  
-  console.log("param---", req);
+  const message = req.body.Body;
+  console.log("param---", message);
 
   const client = new PineconeClient();
   await client.init({
@@ -214,11 +215,12 @@ exports.getReply = async (req, res, next) => {
       returnSourceDocuments: true,
     }
   );
+  
   const result = await chain.call({
-    question: params,
+    question: message,
     chat_history: [],
   });
-
+  console.log("rsult---", result.text);
   try {
     const twiml = new twilio.twiml.MessagingResponse();
     twiml.message(result.text);
@@ -342,7 +344,7 @@ async function trainingFromLinks(links) {
       links.map(async (link, idx) => {
         try {
           const dbData = await insertRow(link);
-          const docs = await createVectorStore_link(
+	  const docs = await createVectorStore_link(
             link,
             dbData._id.toString()
           );
@@ -384,18 +386,22 @@ async function createVectorStore_link(link, id) {
 }
 
 async function detectingCSV(file) {
-  Papa.parse(file, {
-    download: true,
-    header: true,
-    skipEmptyLines: true,
-    complete: (result) => {
-      if (result.data.length != 0) {
-        return result.data;
-      }
-    },
-    error: (err) => {
-      console.log(err);
-    },
+  await new Promise((resolve, reject) => {
+    Papa.parse(file, {
+      download: true,
+      header: true,
+      skipEmptyLines: true,
+      complete: (result) => {
+        if (result.data.length != 0) {
+          return result.data;
+        }
+        resolve();
+      },
+      error: (err) => {
+        console.log(err);
+        reject(err);
+      },
+    });
   });
 }
 
