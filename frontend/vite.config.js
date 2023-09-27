@@ -8,7 +8,7 @@ export default defineConfig({
   },
   define: {
     "process.env": {
-      REACT_APP_BASED_URL: "http://localhost:3000/api/chatbot",
+	REACT_APP_BASED_URL: "http://157.245.134.162/api/chatbot",
     },
   },
 });

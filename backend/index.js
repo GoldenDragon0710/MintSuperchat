@@ -15,8 +15,8 @@ process.setMaxListeners(0);
 const chatbotRouter = require("./routers/chatbotRouter");
 
 // Set up bodyParser middleware
-app.use(bodyParser.urlencoded({ extended: false }));
-app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ limit: '100MB', extended: true }));
+app.use(bodyParser.json({ limit: '100MB' }));
 
 app.use("/api/chatbot", chatbotRouter);
 

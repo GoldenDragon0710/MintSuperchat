@@ -20,7 +20,7 @@ export function SitemapsTab(props) {
   const [modalVisible, setModalVisible] = useState(false);
   const [loading, setLoading] = useState(false);
   const [sitemapLoading, setSitemapLoading] = useState(false);
-  const [sitemapURL, setSitemapURL] = useState("");
+  const [sitemapURL, setSitemapURL] = useState([]);
   const [sitemapURLlist, setSitemapURLlist] = useState([]);
   const [fileList, setFilelist] = useState([]);
   const [fileNameList, setFileNameList] = useState([]);
@@ -42,6 +42,12 @@ export function SitemapsTab(props) {
   };
 
   const handleGetSitemap = () => {
+    if (isLink(sitemapURL) == false) {
+      notification.warning({
+        message: "Please fill out this field correctly.",
+      });
+      return;
+    }
     setSitemapLoading(true);
     axios
       .post(`${process.env.REACT_APP_BASED_URL}/getsitemap`, {
