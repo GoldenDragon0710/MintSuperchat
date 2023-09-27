@@ -32,6 +32,8 @@ export function FilesTab(props) {
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });
+        setFileNameList([]);
+        setFilelist([]);
         setLoading(false);
       })
       .catch((err) => {

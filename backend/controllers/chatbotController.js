@@ -58,15 +58,14 @@ exports.getSitemap = async (req, res, next) => {
       res.status(200).json({
         data: links,
       });
-
-      await browser.close();
+      browser.close();
     }
   } catch (error) {
     console.error(error);
-    await browser.close();
     res.status(500).json({
       message: "An error occurred while crawling website.",
     });
+    browser.close();
   }
 };
 
@@ -81,7 +80,7 @@ exports.training_files = async (req, res, next) => {
             file,
             dbData._id.toString()
           );
-          await storeVectorData(docs);
+          storeVectorData(docs);
           const uploadFolderPath = path.join(__dirname, "../uploads");
           const directoryPath = uploadFolderPath + "/" + file.filename;
           fs.unlink(directoryPath, (err) => {
@@ -141,7 +140,7 @@ exports.training_FAQs = async (req, res, next) => {
             JSONData,
             dbData._id.toString()
           );
-          await storeVectorData(docs);
+          storeVectorData(docs);
           const uploadFolderPath = path.join(__dirname, "../uploads");
           const directoryPath = uploadFolderPath + "/" + file.filename;
           fs.unlink(directoryPath, (err) => {
@@ -174,9 +173,8 @@ exports.deleteDataset = async (req, res, next) => {
       filter: { id: id },
       namespace: process.env.PINECONE_NAMESPACE,
     };
-    await pineconeIndex._delete({ deleteRequest });
-    await deleteRows(id);
-    const list = await getAllRows();
+    pineconeIndex._delete({ deleteRequest });
+    const list = await deleteRows(id);
     return res.json({ data: list });
   } catch (err) {
     console.log(err);
@@ -309,14 +307,14 @@ async function splitContent(pageContent, id) {
 }
 
 async function storeVectorData(docs) {
-  if (docs.length) {
+  if (docs) {
     const pinecone = new PineconeClient();
     await pinecone.init({
       apiKey: process.env.PINECONE_API_KEY,
       environment: process.env.PINECONE_ENVIRONMENT,
     });
     const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX);
-    await PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(), {
+    PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(), {
       pineconeIndex,
       maxConcurrency: 5,
       namespace: process.env.PINECONE_NAMESPACE,
@@ -341,15 +339,16 @@ async function getAllRows() {
 
 async function deleteRows(id) {
   try {
-    const result = await Chatbot.deleteOne({ _id: id });
-    return result;
+    await Chatbot.deleteOne({ _id: id });
+    const list = await getAllRows();
+    return list;
   } catch (err) {
     console.log(err);
   }
 }
 
 async function trainingFromLinks(links) {
-  if (links.length) {
+  if (links) {
     await Promise.all(
       links.map(async (link) => {
         try {
@@ -358,7 +357,7 @@ async function trainingFromLinks(links) {
             link,
             dbData._id.toString()
           );
-          await storeVectorData(docs);
+          storeVectorData(docs);
         } catch (err) {
           console.log(err);
           throw err;

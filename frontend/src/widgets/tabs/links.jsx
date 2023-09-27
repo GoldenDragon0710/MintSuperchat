@@ -43,6 +43,11 @@ export function LinksTab(props) {
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });
+        setURLNum(0);
+        setPrevURL(null);
+        setURLList([]);
+        setdisabledURLs([false]);
+        setSaveables([false]);
         setLoading(false);
       })
       .catch((err) => {

@@ -21,7 +21,7 @@ export function SitemapsTab(props) {
   const [loading, setLoading] = useState(false);
   const [sitemapLoading, setSitemapLoading] = useState(false);
   const [sitemapURL, setSitemapURL] = useState("");
-  const [sitemapURLlist, setSitemapURLlist] = useState("");
+  const [sitemapURLlist, setSitemapURLlist] = useState([]);
   const [fileList, setFilelist] = useState([]);
   const [fileNameList, setFileNameList] = useState([]);
   const [checkedURLs, setcheckedURLs] = useState([]);
@@ -50,7 +50,7 @@ export function SitemapsTab(props) {
       .then((res) => {
         setModalVisible(true);
         setSitemapURLlist(res.data.data);
-        let list = Array(sitemapURLlist.length).fill(false);
+        let list = Array(res.data.data.length).fill(false);
         setcheckedURLs(list);
         setSitemapLoading(false);
       })
@@ -71,7 +71,7 @@ export function SitemapsTab(props) {
     let list = [];
     let samefiles = 0;
     let samelinks = 0;
-    if (fileNameList.length != 0) {
+    if (fileNameList) {
       for (const file of fileList) {
         if (props.dataset.includes(file.name) == false) {
           await new Promise((resolve, reject) => {
@@ -80,7 +80,7 @@ export function SitemapsTab(props) {
               header: false,
               skipEmptyLines: true,
               complete: async (result) => {
-                if (result.data.length != 0) {
+                if (result.data) {
                   result.data.map((item) => {
                     if (
                       list.includes(item[0]) == false &&
@@ -106,7 +106,7 @@ export function SitemapsTab(props) {
       }
     }
     let urllist = [];
-    if (sitemapURLlist.length != 0) {
+    if (sitemapURLlist) {
       for (let i = 0; i < sitemapURLlist.length; i++) {
         if (checkedURLs[i])
           if (props.dataset.includes(sitemapURLlist[i]) == false) {
@@ -130,6 +130,10 @@ export function SitemapsTab(props) {
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });
+        setSitemapURL(null);
+        setFileNameList(null);
+        setFilelist(null);
+        setcheckedURLs([]);
         setLoading(false);
       })
       .catch((err) => {
@@ -244,7 +248,7 @@ export function SitemapsTab(props) {
         </Button>
       </div>
       <div className="flex flex-col items-start">
-        {fileNameList.length != 0 &&
+        {fileNameList &&
           fileNameList.map((item, idx) => {
             return (
               <div key={idx} className="flex w-full justify-between">
@@ -261,7 +265,7 @@ export function SitemapsTab(props) {
               </div>
             );
           })}
-        {sitemapURLlist.length != 0 &&
+        {sitemapURLlist &&
           sitemapURLlist.map((item, idx) => {
             return (
               <div key={idx} className="w-full">
