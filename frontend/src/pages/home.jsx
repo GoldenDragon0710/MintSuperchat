@@ -20,10 +20,19 @@ import { ClipLoader } from "react-spinners";
 export function Home() {
   const [loading, setLoading] = useState(false);
   const [dataset, setDataset] = useState([]);
+  const [namelist, setNamelist] = useState([]);
 
   useEffect(() => {
     getDataset();
   }, []);
+
+  useEffect(() => {
+    let list = [];
+    dataset.map((item) => {
+      list.push(item.name);
+    });
+    setNamelist(list);
+  }, [dataset]);
 
   const data = [
     {
@@ -90,16 +99,16 @@ export function Home() {
                 </TabsHeader>
                 <TabsBody>
                   <TabPanel key={"Upload"} value={"Upload"}>
-                    <FilesTab setDataset={setDataset} dataset={dataset} />
+                    <FilesTab setDataset={setDataset} namelist={namelist} />
                   </TabPanel>
                   <TabPanel key={"Link"} value={"Link"}>
-                    <LinksTab setDataset={setDataset} dataset={dataset} />
+                    <LinksTab setDataset={setDataset} namelist={namelist} />
                   </TabPanel>
                   <TabPanel key={"Sitemap"} value={"Sitemap"}>
-                    <SitemapsTab setDataset={setDataset} dataset={dataset} />
+                    <SitemapsTab setDataset={setDataset} namelist={namelist} />
                   </TabPanel>
                   <TabPanel key={"FAQs"} value={"FAQs"}>
-                    <FAQsTabs setDataset={setDataset} dataset={dataset} />
+                    <FAQsTabs setDataset={setDataset} namelist={namelist} />
                   </TabPanel>
                 </TabsBody>
               </Tabs>

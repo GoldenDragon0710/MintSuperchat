@@ -16,7 +16,7 @@ export function FilesTab(props) {
     const formData = new FormData();
     if (fileNameList.length != 0) {
       for (let i = 0; i < fileList.length; i++) {
-        if (props.dataset.includes(fileList[i].name) == false) {
+        if (props.namelist.includes(fileList[i].name) == false) {
           formData.append("files", fileList[i]);
         } else {
           samefiles++;

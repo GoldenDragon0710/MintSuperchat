@@ -79,7 +79,7 @@ export function SitemapsTab(props) {
     let samelinks = 0;
     if (fileNameList) {
       for (const file of fileList) {
-        if (props.dataset.includes(file.name) == false) {
+        if (props.namelist.includes(file.name) == false) {
           await new Promise((resolve, reject) => {
             Papa.parse(file, {
               download: true,
@@ -90,7 +90,7 @@ export function SitemapsTab(props) {
                   result.data.map((item) => {
                     if (
                       list.includes(item[0]) == false &&
-                      props.dataset.includes(item[0]) == false
+                      props.namelist.includes(item[0]) == false
                     ) {
                       list.push(item[0]);
                     } else {
@@ -111,16 +111,15 @@ export function SitemapsTab(props) {
         }
       }
     }
-    let urllist = [];
     if (sitemapURLlist) {
       for (let i = 0; i < sitemapURLlist.length; i++) {
-        if (checkedURLs[i])
-          if (props.dataset.includes(sitemapURLlist[i]) == false) {
+        if (checkedURLs[i]) {
+          if (props.namelist.includes(sitemapURLlist[i]) == false) {
             list.push(sitemapURLlist[i]);
-            urllist.push(sitemapURLlist[i]);
           } else {
             samelinks++;
           }
+        }
       }
     }
     if (samefiles != 0) {
@@ -129,6 +128,8 @@ export function SitemapsTab(props) {
     if (samelinks != 0) {
       notification.warning({ message: `${samelinks} links are duplicated` });
     }
+
+    console.log(list);
     axios
       .post(`${process.env.REACT_APP_BASED_URL}/training/sitemap`, {
         links: list,
@@ -136,7 +137,7 @@ export function SitemapsTab(props) {
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });
-        setSitemapURL(null);
+        setSitemapURL("");
         setFileNameList(null);
         setFilelist(null);
         setcheckedURLs([]);
@@ -147,6 +148,7 @@ export function SitemapsTab(props) {
         notification.error({ message: err.response.data.message });
         setLoading(false);
       });
+    setLoading(false);
   };
 
   const isLink = (str) => {

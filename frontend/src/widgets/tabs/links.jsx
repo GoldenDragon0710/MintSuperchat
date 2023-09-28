@@ -26,7 +26,7 @@ export function LinksTab(props) {
     let list = [];
     let samelinks = 0;
     data.map((item) => {
-      if (props.dataset.includes(item) == false) {
+      if (props.namelist.includes(item) == false) {
         list.push(item);
       } else {
         samelinks++;
