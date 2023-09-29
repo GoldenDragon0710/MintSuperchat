@@ -48,9 +48,12 @@ exports.getSitemap = async (req, res, next) => {
         links.map((link) => link.href)
       );
       const templinks = [];
+      templinks.push(URL);
       linkHrefs.map((linkHref) => {
         if (linkHref.includes(URL)) {
-          templinks.push(linkHref.split("#")[0]);
+          if (templinks.includes(linkHref.split("#")[0]) == false) {
+            templinks.push(linkHref.split("#")[0]);
+          }
         }
       });
       const links = [...new Set(templinks)];
@@ -369,28 +372,30 @@ async function trainingFromLinks(links) {
 }
 
 async function createVectorStore_link(link, id) {
-  const loader = new PuppeteerWebBaseLoader(link, {
-    launchOptions: {
-      headless: "new",
-      args: ["--no-sandbox"],
-    },
-    async evaluate(page) {
-      const result = await page.evaluate(() => {
-        const scripts = document.body.querySelectorAll("script");
-        const noscript = document.body.querySelectorAll("noscript");
-        const styles = document.body.querySelectorAll("style");
-        const scriptAndStyle = [...scripts, ...noscript, ...styles];
-        scriptAndStyle.forEach((e) => e.remove());
+  const browser = await puppeteer.launch({
+    headless: "new",
+    args: ["--no-sandbox"],
+  });
+  const page = await browser.newPage();
 
-        const mainElement = document.querySelector("main");
-        return mainElement ? mainElement.innerText : document.body.innerText;
-      });
-      return result;
-    },
+  await page.goto(link, {
+    waitUntil: "domcontentloaded",
+    timeout: 0,
+  });
+ 
+  const docs = await page.evaluate(() => {
+    const scripts = document.body.querySelectorAll("script");
+    const noscript = document.body.querySelectorAll("noscript");
+    const styles = document.body.querySelectorAll("style");
+    const scriptAndStyle = [...scripts, ...noscript, ...styles];
+    scriptAndStyle.forEach((e) => e.remove());
+
+    const mainElement = document.querySelector("main");
+    return mainElement ? mainElement.innerText : document.body.innerText;
   });
 
-  const docs = await loader.load();
-  const output = await splitContent(docs[0].pageContent, id);
+  let output = null;
+  if (docs) output = await splitContent(docs, id);
   return output;
 }
 

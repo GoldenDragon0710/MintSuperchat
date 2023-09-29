@@ -72,7 +72,7 @@ export function FAQsTabs(props) {
     <>
       <div className="m-1 flex w-full justify-end">
         <a
-          href={"public/templates/faq_template.csv"}
+          href={"../../../public/templates/faq_template.csv"}
           download="FAQs_template.csv"
           target="_blank"
           rel="noreferrer"
