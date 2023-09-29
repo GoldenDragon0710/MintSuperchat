@@ -78,13 +78,13 @@ export function SitemapsTab(props) {
   };
 
   const handleTrain = async () => {
-    if (sitemapURLlist.length == 0 || fileList.length == 0) {
+    if (sitemapURLlist.length == 0 && fileList.length == 0) {
       notification.warning({
         message: "There are no datasets for training.",
       });
       return;
     }
-    setLoading(true);
+
     let list = [];
     let samefiles = 0;
     let samelinks = 0;
@@ -98,16 +98,15 @@ export function SitemapsTab(props) {
             skipEmptyLines: true,
             complete: (result) => {
               if (result.data) {
-                result.data.map((item) => {
-                  let link = item[0];
+                for (let i = 0; i < result.data.length; i++) {
+                  let link = result.data[i][0];
                   if (isLink(link) == false) {
                     notification.warning({
                       message: "File format is incorrectly.",
                     });
-                    reject();
                     return;
                   }
-                  if (link[link.length - 1] == "/") link = link.splice(0, -1);
+                  if (link[link.length - 1] == "/") link = link.slice(0, -1);
                   if (list.includes(link) == false) {
                     if (props.namelist.includes(link) == false) {
                       list.push(link);
@@ -115,11 +114,10 @@ export function SitemapsTab(props) {
                   } else {
                     samelinks++;
                   }
-                  resolve();
-                });
+                }
+                resolve();
               } else {
                 notification.warning({ message: "Empty File." });
-                reject();
                 return;
               }
             },
@@ -153,11 +151,13 @@ export function SitemapsTab(props) {
       notification.warning({ message: `${samelinks} links are duplicated` });
     }
 
-    console.log(list);
+    setLoading(true);
     axios
-      .post(`${process.env.REACT_APP_BASED_URL}/training/sitemap`, {
-        links: list,
-      })
+      .post(
+        `${process.env.REACT_APP_BASED_URL}/training/sitemap`,
+        { links: list },
+        { timeout: 180000 }
+      )
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });
