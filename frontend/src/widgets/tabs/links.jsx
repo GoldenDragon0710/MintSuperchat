@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { Button, Input, Typography } from "@material-tailwind/react";
 import { notification } from "antd";
 import {
@@ -10,6 +9,7 @@ import {
   XMarkIcon,
 } from "@heroicons/react/24/solid";
 import ClipLoader from "react-spinners/ClipLoader";
+import apiClient from "../../variable";
 
 export function LinksTab(props) {
   const [urlNum, setURLNum] = useState(0);
@@ -36,10 +36,8 @@ export function LinksTab(props) {
       notification.warning({ message: `${samelinks} links are duplicated.` });
     }
 
-    axios
-      .post(`${process.env.REACT_APP_BASED_URL}/training/links`, {
-        links: list,
-      })
+    apiClient
+      .post("/training/links", { links: list })
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });

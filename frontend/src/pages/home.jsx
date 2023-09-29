@@ -1,8 +1,6 @@
 import React, { useEffect, useState } from "react";
-import axios from "axios";
 import {
   Button,
-  Textarea,
   Tabs,
   TabsHeader,
   TabsBody,
@@ -16,6 +14,7 @@ import SitemapsTab from "@/widgets/tabs/sitemaps";
 import FAQsTabs from "@/widgets/tabs/FAQs";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { ClipLoader } from "react-spinners";
+import apiClient from "../variable";
 
 export function Home() {
   const [loading, setLoading] = useState(false);
@@ -55,8 +54,8 @@ export function Home() {
 
   const getDataset = () => {
     setLoading(true);
-    axios
-      .get(`${process.env.REACT_APP_BASED_URL}/getDataset`)
+    apiClient
+      .get("/getDataset")
       .then((res) => {
         setLoading(false);
         setDataset(res.data.data);
@@ -69,10 +68,8 @@ export function Home() {
 
   const handleDeleteDataset = (id) => {
     setLoading(true);
-    axios
-      .post(`${process.env.REACT_APP_BASED_URL}/deleteDataset`, {
-        id: id,
-      })
+    apiClient
+      .post("/deleteDataset", { id: id })
       .then((res) => {
         setLoading(false);
         setDataset(res.data.data);

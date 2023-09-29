@@ -1,9 +1,10 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { Button, Avatar, Typography } from "@material-tailwind/react";
 import ClipLoader from "react-spinners/ClipLoader";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { notification } from "antd";
+import axios from "axios";
+// import apiClient from "../../variable";
 
 export function FilesTab(props) {
   const [loading, setLoading] = useState(false);

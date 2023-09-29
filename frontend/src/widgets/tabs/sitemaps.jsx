@@ -1,5 +1,4 @@
 import React, { useState } from "react";
-import axios from "axios";
 import {
   Button,
   Input,
@@ -15,6 +14,7 @@ import { List, notification } from "antd";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import Papa from "papaparse";
 import ClipLoader from "react-spinners/ClipLoader";
+import apiClient from "../../variable";
 
 export function SitemapsTab(props) {
   const [modalVisible, setModalVisible] = useState(false);
@@ -60,10 +60,8 @@ export function SitemapsTab(props) {
       return;
     }
     setSitemapLoading(true);
-    axios
-      .post(`${process.env.REACT_APP_BASED_URL}/getsitemap`, {
-        URL: sitemapURL,
-      })
+    apiClient
+      .post("/getsitemap", { URL: sitemapURL })
       .then((res) => {
         setModalVisible(true);
         setSitemapURLlist(res.data.data);
@@ -152,12 +150,8 @@ export function SitemapsTab(props) {
     }
 
     setLoading(true);
-    axios
-      .post(
-        `${process.env.REACT_APP_BASED_URL}/training/sitemap`,
-        { links: list },
-        { timeout: 180000 }
-      )
+    apiClient
+      .post("/training/sitemap", { links: list })
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });

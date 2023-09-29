@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import axios from "axios";
 import { Button, Avatar, Typography } from "@material-tailwind/react";
 import { notification } from "antd";
 import ClipLoader from "react-spinners/ClipLoader";
 import { TrashIcon } from "@heroicons/react/24/outline";
+import apiClient from "../../variable";
 
 export function FAQsTabs(props) {
   const [loading, setLoading] = useState(false);
@@ -27,8 +27,8 @@ export function FAQsTabs(props) {
       notification.warning({ message: `${samefiles} files are duplicated.` });
     }
 
-    axios
-      .post(`${process.env.REACT_APP_BASED_URL}/training/FAQs`, formData)
+    apiClient
+      .post("/training/FAQs", formData)
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });

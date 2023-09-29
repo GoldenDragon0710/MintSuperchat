@@ -78,15 +78,16 @@ exports.getSitemap = async (req, res, next) => {
 exports.training_files = async (req, res, next) => {
   const files = req.files;
   if (files) {
+    let vectorStore = [];
     await Promise.all(
       files.map(async (file) => {
         try {
           const dbData = await insertRow(file.originalname);
-          const docs = await createVectorStore_file(
+          await createVectorStore_file(
             file,
-            dbData._id.toString()
+            dbData._id.toString(),
+            vectorStore
           );
-          storeVectorData(docs);
           const uploadFolderPath = path.join(__dirname, "../uploads");
           const directoryPath = uploadFolderPath + "/" + file.filename;
           fs.unlink(directoryPath, (err) => {
@@ -98,6 +99,8 @@ exports.training_files = async (req, res, next) => {
         }
       })
     );
+
+    await storeVectorData(vectorStore);
     const rows = await getAllRows();
     return res.json({ data: rows });
   } else {
@@ -125,7 +128,7 @@ exports.training_sitemap = async (req, res, next) => {
     if (links) {
       await trainingFromLinks(links);
       const rows = await getAllRows();
-      return res.json({ data: rows });
+      res.json({ data: rows });
     }
   } catch (err) {
     console.log(err);
@@ -135,18 +138,19 @@ exports.training_sitemap = async (req, res, next) => {
 
 exports.training_FAQs = async (req, res, next) => {
   const files = req.files;
-
   if (files) {
+    let vectorStore = [];
     await Promise.all(
       files.map(async (file) => {
         try {
           const dbData = await insertRow(file.originalname);
           let JSONData = await detectingCSV(file);
-          const docs = await createVectorStore_JSON(
+          await createVectorStore_JSON(
             JSONData,
-            dbData._id.toString()
+            dbData._id.toString(),
+            vectorStore
           );
-          storeVectorData(docs);
+
           const uploadFolderPath = path.join(__dirname, "../uploads");
           const directoryPath = uploadFolderPath + "/" + file.filename;
           fs.unlink(directoryPath, (err) => {
@@ -159,6 +163,7 @@ exports.training_FAQs = async (req, res, next) => {
         }
       })
     );
+    await storeVectorData(vectorStore);
     const rows = await getAllRows();
     return res.json({ data: rows });
   } else {
@@ -254,7 +259,7 @@ async function insertRow(name) {
   }
 }
 
-async function createVectorStore_file(file, id) {
+async function createVectorStore_file(file, id, vectorStore) {
   let loader;
   const ext = file.filename.split(".")[1];
   if (ext === "pdf") {
@@ -272,11 +277,11 @@ async function createVectorStore_file(file, id) {
     return;
   }
   const docs = await loader.load();
-  const output = await splitContent(docs[0].pageContent, id);
+  const output = await splitContent(docs[0].pageContent, id, vectorStore);
   return output;
 }
 
-async function handleXlsxFile(file, id) {
+async function handleXlsxFile(file, id, vectorStore) {
   const workbook = xlsx.readFile("uploads/" + file.filename);
   let workbook_sheet = workbook.SheetNames;
   let res = xlsx.utils.sheet_to_json(workbook.Sheets[workbook_sheet[0]]);
@@ -284,20 +289,19 @@ async function handleXlsxFile(file, id) {
   for (let i = 0; i < res.length; i++) {
     temp.concat(JSON.stringify(res[i]).replaceAll(",", "\n"));
   }
-  const output = await splitContent(temp, id);
+  const output = await splitContent(temp, id, vectorStore);
   return output;
 }
 
-async function splitContent(pageContent, id) {
+async function splitContent(pageContent, id, vectorStore) {
   const splitter = new RecursiveCharacterTextSplitter({
     chunkSize: 300,
     chunkOverlap: 20,
   });
   const output = await splitter.createDocuments([pageContent]);
 
-  const result = [];
   output.map((item) => {
-    result.push(
+    vectorStore.push(
       new Document({
         metadata: {
           ...item.metadata,
@@ -307,9 +311,6 @@ async function splitContent(pageContent, id) {
       })
     );
   });
-
-  // console.log(result.map((item) => item.metadata));
-  return result;
 }
 
 async function storeVectorData(docs) {
@@ -355,26 +356,28 @@ async function deleteRows(id) {
 
 async function trainingFromLinks(links) {
   if (links) {
+    let vectorStore = [];
     await Promise.all(
       links.map(async (link) => {
         try {
           const dbData = await insertRow(link);
-          const docs = await createVectorStore_link(
+          await createVectorStore_link(
             link,
-            dbData._id.toString()
+            dbData._id.toString(),
+            vectorStore
           );
-          storeVectorData(docs);
         } catch (err) {
           console.log(err);
           throw err;
         }
       })
     );
+    await storeVectorData(vectorStore);
   }
   return;
 }
 
-async function createVectorStore_link(link, id) {
+async function createVectorStore_link(link, id, vectorStore) {
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox"],
@@ -398,7 +401,7 @@ async function createVectorStore_link(link, id) {
   });
 
   let output = null;
-  if (docs) output = await splitContent(docs, id);
+  if (docs) output = await splitContent(docs, id, vectorStore);
   return output;
 }
 
@@ -410,7 +413,7 @@ async function detectingCSV(file) {
   return result.data;
 }
 
-async function createVectorStore_JSON(JSONData, id) {
-  const output = await splitContent(JSON.stringify(JSONData), id);
+async function createVectorStore_JSON(JSONData, id, vectorStore) {
+  const output = await splitContent(JSON.stringify(JSONData), id, vectorStore);
   return output;
 }
