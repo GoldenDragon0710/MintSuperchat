@@ -41,6 +41,17 @@ export function SitemapsTab(props) {
     setcheckedURLs(newlist);
   };
 
+  const handleSitemapURLs = () => {
+    let list = [];
+    sitemapURLlist.map((item, idx) => {
+      if (checkedURLs[idx]) {
+        list.push(item);
+      }
+    });
+    setSitemapURLlist(list);
+    setModalVisible(!modalVisible);
+  };
+
   const handleGetSitemap = () => {
     if (isLink(sitemapURL) == false) {
       notification.warning({
@@ -56,7 +67,7 @@ export function SitemapsTab(props) {
       .then((res) => {
         setModalVisible(true);
         setSitemapURLlist(res.data.data);
-        let list = Array(res.data.data.length).fill(false);
+        let list = Array(res.data.data.length).fill(true);
         setcheckedURLs(list);
         setSitemapLoading(false);
       })
@@ -67,9 +78,9 @@ export function SitemapsTab(props) {
   };
 
   const handleTrain = async () => {
-    if (isLink(sitemapURL) == false && fileList.length == 0) {
+    if (sitemapURLlist.length == 0 || fileList.length == 0) {
       notification.warning({
-        message: "Please fill out this field correctly.",
+        message: "There are no datasets for training.",
       });
       return;
     }
@@ -77,48 +88,61 @@ export function SitemapsTab(props) {
     let list = [];
     let samefiles = 0;
     let samelinks = 0;
-    if (fileNameList) {
-      for (const file of fileList) {
-        if (props.namelist.includes(file.name) == false) {
-          await new Promise((resolve, reject) => {
-            Papa.parse(file, {
-              download: true,
-              header: false,
-              skipEmptyLines: true,
-              complete: async (result) => {
-                if (result.data) {
-                  result.data.map((item) => {
-                    if (
-                      list.includes(item[0]) == false &&
-                      props.namelist.includes(item[0]) == false
-                    ) {
-                      list.push(item[0]);
-                    } else {
-                      samelinks++;
+
+    for (const file of fileList) {
+      if (props.namelist.includes(file.name) == false) {
+        await new Promise((resolve, reject) => {
+          Papa.parse(file, {
+            download: true,
+            header: false,
+            skipEmptyLines: true,
+            complete: (result) => {
+              if (result.data) {
+                result.data.map((item) => {
+                  let link = item[0];
+                  if (isLink(link) == false) {
+                    notification.warning({
+                      message: "File format is incorrectly.",
+                    });
+                    reject();
+                    return;
+                  }
+                  if (link[link.length - 1] == "/") link = link.splice(0, -1);
+                  if (list.includes(link) == false) {
+                    if (props.namelist.includes(link) == false) {
+                      list.push(link);
                     }
-                  });
-                }
-                resolve();
-              },
-              error: (err) => {
-                console.log(err);
-                reject(err);
-              },
-            });
+                  } else {
+                    samelinks++;
+                  }
+                  resolve();
+                });
+              } else {
+                notification.warning({ message: "Empty File." });
+                reject();
+                return;
+              }
+            },
+            error: (err) => {
+              console.log(err);
+              reject(err);
+            },
           });
-        } else {
-          samefiles++;
-        }
+        });
+      } else {
+        samefiles++;
       }
     }
+
     if (sitemapURLlist) {
       for (let i = 0; i < sitemapURLlist.length; i++) {
-        if (checkedURLs[i]) {
-          if (props.namelist.includes(sitemapURLlist[i]) == false) {
-            list.push(sitemapURLlist[i]);
-          } else {
-            samelinks++;
-          }
+        if (
+          props.namelist.includes(sitemapURLlist[i]) == false ||
+          list.includes(sitemapURLlist[i]) == false
+        ) {
+          list.push(sitemapURLlist[i]);
+        } else {
+          samelinks++;
         }
       }
     }
@@ -148,7 +172,6 @@ export function SitemapsTab(props) {
         notification.error({ message: err.response.data.message });
         setLoading(false);
       });
-    setLoading(false);
   };
 
   const isLink = (str) => {
@@ -277,20 +300,18 @@ export function SitemapsTab(props) {
           sitemapURLlist.map((item, idx) => {
             return (
               <div key={idx} className="w-full">
-                {checkedURLs[idx] && (
-                  <div className="flex w-full justify-between">
-                    <Typography className="text-[16px] text-black">
-                      {item}
-                    </Typography>
-                    <Button
-                      variant="text"
-                      onClick={() => handleDeleteURL(idx)}
-                      className="flex h-8 w-8 items-center justify-center p-0"
-                    >
-                      <TrashIcon className="w-6" color="black" />
-                    </Button>
-                  </div>
-                )}
+                <div className="flex w-full justify-between">
+                  <Typography className="text-[16px] text-black">
+                    {item}
+                  </Typography>
+                  <Button
+                    variant="text"
+                    onClick={() => handleDeleteURL(idx)}
+                    className="flex h-8 w-8 items-center justify-center p-0"
+                  >
+                    <TrashIcon className="w-6" color="black" />
+                  </Button>
+                </div>
               </div>
             );
           })}
@@ -328,7 +349,7 @@ export function SitemapsTab(props) {
                     containerProps={{
                       className: "p-0 mx-2",
                     }}
-                    // checked
+                    checked={checkedURLs[idx]}
                   />
                   {/* <Typography>{item.link}</Typography> */}
                   <Typography>{item}</Typography>
@@ -339,7 +360,7 @@ export function SitemapsTab(props) {
           />
         </DialogBody>
         <DialogFooter>
-          <Button variant="gradient" color="green" onClick={handleOpen}>
+          <Button variant="gradient" color="green" onClick={handleSitemapURLs}>
             <Typography>Ok</Typography>
           </Button>
         </DialogFooter>

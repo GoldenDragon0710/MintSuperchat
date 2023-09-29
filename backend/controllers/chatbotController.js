@@ -48,11 +48,14 @@ exports.getSitemap = async (req, res, next) => {
         links.map((link) => link.href)
       );
       const templinks = [];
+      if (URL[URL.length - 1] == "/") URL = URL.slice(0, -1);
       templinks.push(URL);
       linkHrefs.map((linkHref) => {
         if (linkHref.includes(URL)) {
           if (templinks.includes(linkHref.split("#")[0]) == false) {
-            templinks.push(linkHref.split("#")[0]);
+            let item = linkHref.split("#")[0];
+            if (item[item.length - 1] == "/") item = item.slice(0, -1);
+            templinks.push(item);
           }
         }
       });
@@ -382,7 +385,7 @@ async function createVectorStore_link(link, id) {
     waitUntil: "domcontentloaded",
     timeout: 0,
   });
- 
+
   const docs = await page.evaluate(() => {
     const scripts = document.body.querySelectorAll("script");
     const noscript = document.body.querySelectorAll("noscript");
