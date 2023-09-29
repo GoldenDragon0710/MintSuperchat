@@ -3,7 +3,8 @@ import { Button, Avatar, Typography } from "@material-tailwind/react";
 import { notification } from "antd";
 import ClipLoader from "react-spinners/ClipLoader";
 import { TrashIcon } from "@heroicons/react/24/outline";
-import apiClient from "../../variable";
+import axios from "axios";
+import Papa from "papaparse";
 
 export function FAQsTabs(props) {
   const [loading, setLoading] = useState(false);
@@ -11,24 +12,51 @@ export function FAQsTabs(props) {
   const [fileNameList, setFileNameList] = useState([]);
 
   const handleTrain = async () => {
-    setLoading(true);
     let samefiles = 0;
     const formData = new FormData();
-    if (fileNameList.length != 0) {
-      for (let i = 0; i < fileList.length; i++) {
-        if (props.namelist.includes(fileList[i].name) == false) {
-          formData.append("files", fileList[i]);
-        } else {
-          samefiles++;
-        }
+    for (const file of fileList) {
+      if (props.namelist.includes(file.name) == false) {
+        await new Promise((resolve, reject) => {
+          Papa.parse(file, {
+            download: true,
+            header: true,
+            skipEmptyLines: true,
+            complete: (result) => {
+              if (result.data) {
+                for (let i = 0; i < result.data.length; i++) {
+                  let data = result.data[i];
+                  console.log(data.question);
+                  if (data.question == undefined || data.answer == undefined) {
+                    notification.warning({
+                      message: "File format is incorrectly.",
+                    });
+                    return;
+                  }
+                }
+                resolve();
+              } else {
+                notification.warning({ message: "Empty File." });
+                return;
+              }
+            },
+            error: (err) => {
+              console.log(err);
+              reject(err);
+            },
+          });
+        });
+        formData.append("files", file);
+      } else {
+        samefiles++;
       }
     }
+
     if (samefiles != 0) {
       notification.warning({ message: `${samefiles} files are duplicated.` });
     }
-
-    apiClient
-      .post("/training/FAQs", formData)
+    setLoading(true);
+    axios
+      .post(`${process.env.REACT_APP_BASED_URL}/training/FAQs`, formData)
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });
