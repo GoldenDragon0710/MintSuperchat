@@ -28,9 +28,9 @@ app.use((err, req, res, next) => {
 
 // Connect to MongoDB and start the server
 
-const connectDB = require("./app/config/db.config");
+const connectDB = require("./config/db.config");
 connectDB();
 
-app.listen(PORT, () => {
+app.listen(process.env.PORT, () => {
   console.log(`Server is running on port ${process.env.PORT}.`);
 });
