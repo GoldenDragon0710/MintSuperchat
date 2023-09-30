@@ -19,17 +19,17 @@ const readFileAsync = promisify(fs.readFile);
 const unlinkAsync = promisify(fs.unlink);
 require("dotenv").config();
 
-exports.getDataset = async (req, res, next) => {
+const getDataset = async (req, res) => {
   try {
     const rows = await Chatbot.find({ trainflag: true });
-    return res.json({ data: rows });
+    return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
   }
 };
 
-exports.getSitemap = async (req, res, next) => {
+const getSitemap = async (req, res) => {
   const browser = await puppeteer.launch({
     headless: "new",
     args: ["--no-sandbox"],
@@ -73,7 +73,7 @@ exports.getSitemap = async (req, res, next) => {
   }
 };
 
-exports.getReply = async (req, res, next) => {
+const getReply = async (req, res) => {
   const message = req.body.Body;
 
   const client = new PineconeClient();
@@ -130,7 +130,7 @@ exports.getReply = async (req, res, next) => {
   }
 };
 
-exports.deleteDataset = async (req, res, next) => {
+const deleteDataset = async (req, res) => {
   const id = req.body.id;
   try {
     const pinecone = new PineconeClient();
@@ -153,7 +153,7 @@ exports.deleteDataset = async (req, res, next) => {
   }
 };
 
-exports.trainbot = async (req, res, next) => {
+const trainbot = async (req, res) => {
   const { links } = req.body;
   const files = req.files;
   let vectorStore = [];
@@ -311,3 +311,11 @@ async function splitContent(pageContent, id, vectorStore) {
     );
   });
 }
+
+module.exports = {
+  getDataset,
+  getSitemap,
+  getReply,
+  deleteDataset,
+  trainbot,
+};
