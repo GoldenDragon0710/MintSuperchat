@@ -2,4 +2,14 @@ backend/node_modules
 backend/.env
 
 frontend/node_modules
+frontend/public
+frontend/src
+frontend/index.html
+frontend/jsconfig.json
+frontend/LICENSE
+frontend/package-lock.json
+frontend/package.json
+frontend/postcss.config.cjs
+frontend/prettier.config.cjs
+frontend/tailwind.config.cjs
 frontend/vite.config.js
