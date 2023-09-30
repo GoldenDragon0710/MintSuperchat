@@ -21,6 +21,7 @@ const upload = multer({
     if (
       file.mimetype == "application/pdf" ||
       file.mimetype == "text/plain" ||
+      file.mimetype == "text/csv" ||
       file.mimetype == "application/msword" ||
       file.mimetype ==
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
@@ -33,7 +34,7 @@ const upload = multer({
       cb(null, false);
       return cb(
         new Error(
-          "Only .pdf, .txt, .doc, .docx, .xls and .xlsx format allowed!"
+          "Only .pdf, .txt, .doc, .docx, .csv, .xls and .xlsx format allowed!"
         )
       );
     }
