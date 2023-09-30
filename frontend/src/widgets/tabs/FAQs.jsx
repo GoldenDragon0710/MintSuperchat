@@ -25,7 +25,6 @@ export function FAQsTabs(props) {
               if (result.data) {
                 for (let i = 0; i < result.data.length; i++) {
                   let data = result.data[i];
-                  console.log(data.question);
                   if (data.question == undefined || data.answer == undefined) {
                     notification.warning({
                       message: "File format is incorrectly.",
@@ -56,7 +55,7 @@ export function FAQsTabs(props) {
     }
     setLoading(true);
     axios
-      .post(`${process.env.REACT_APP_BASED_URL}/training/FAQs`, formData)
+      .post(`${process.env.REACT_APP_BASED_URL}/train`, formData)
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });

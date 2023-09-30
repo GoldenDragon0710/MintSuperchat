@@ -1,29 +1,27 @@
-const Chatbot = require("../models/Chatbot");
-const puppeteer = require("puppeteer");
-const { OpenAIEmbeddings } = require("langchain/embeddings/openai");
 const { RecursiveCharacterTextSplitter } = require("langchain/text_splitter");
+const { ConversationalRetrievalQAChain } = require("langchain/chains");
+const { OpenAIEmbeddings } = require("langchain/embeddings/openai");
 const { PineconeStore } = require("langchain/vectorstores/pinecone");
 const { PineconeClient } = require("@pinecone-database/pinecone");
-const { ChatOpenAI } = require("langchain/chat_models/openai");
-const { ConversationalRetrievalQAChain } = require("langchain/chains");
-const {
-  PuppeteerWebBaseLoader,
-} = require("langchain/document_loaders/web/puppeteer");
 const { PDFLoader } = require("langchain/document_loaders/fs/pdf");
 const { DocxLoader } = require("langchain/document_loaders/fs/docx");
+const { ChatOpenAI } = require("langchain/chat_models/openai");
 const { TextLoader } = require("langchain/document_loaders/fs/text");
-const { CSVLoader } = require("langchain/document_loaders/fs/csv");
-const xlsx = require("xlsx");
 const { Document } = require("langchain/document");
+const Chatbot = require("../models/Chatbot");
+const xlsx = require("xlsx");
 const Papa = require("papaparse");
 const fs = require("fs");
-const path = require("path");
+const puppeteer = require("puppeteer");
 const twilio = require("twilio");
+const { promisify } = require("util");
+const readFileAsync = promisify(fs.readFile);
+const unlinkAsync = promisify(fs.unlink);
 require("dotenv").config();
 
 exports.getDataset = async (req, res, next) => {
   try {
-    const rows = await getAllRows();
+    const rows = await Chatbot.find({ trainflag: true });
     return res.json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -66,130 +64,12 @@ exports.getSitemap = async (req, res, next) => {
       });
       browser.close();
     }
-  } catch (error) {
-    console.error(error);
+  } catch (err) {
+    console.error(err);
     res.status(500).json({
       message: "An error occurred while crawling website.",
     });
     browser.close();
-  }
-};
-
-exports.training_files = async (req, res, next) => {
-  const files = req.files;
-  if (files) {
-    let vectorStore = [];
-    await Promise.all(
-      files.map(async (file) => {
-        try {
-          const dbData = await insertRow(file.originalname);
-          await createVectorStore_file(
-            file,
-            dbData._id.toString(),
-            vectorStore
-          );
-          const uploadFolderPath = path.join(__dirname, "../uploads");
-          const directoryPath = uploadFolderPath + "/" + file.filename;
-          fs.unlink(directoryPath, (err) => {
-            if (err) throw err;
-          });
-        } catch (err) {
-          console.log(err);
-          return res.status(500).json({ message: "Internal server error" });
-        }
-      })
-    );
-
-    await storeVectorData(vectorStore);
-    const rows = await getAllRows();
-    return res.json({ data: rows });
-  } else {
-    return res.status(500).json({ message: "No file is selected." });
-  }
-};
-
-exports.training_links = async (req, res, next) => {
-  const links = req.body.links;
-  try {
-    if (links) {
-      await trainingFromLinks(links);
-      const rows = await getAllRows();
-      return res.json({ data: rows });
-    }
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-exports.training_sitemap = async (req, res, next) => {
-  const links = req.body.links;
-  try {
-    if (links) {
-      await trainingFromLinks(links);
-      const rows = await getAllRows();
-      res.json({ data: rows });
-    }
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Internal server error" });
-  }
-};
-
-exports.training_FAQs = async (req, res, next) => {
-  const files = req.files;
-  if (files) {
-    let vectorStore = [];
-    await Promise.all(
-      files.map(async (file) => {
-        try {
-          const dbData = await insertRow(file.originalname);
-          let JSONData = await detectingCSV(file);
-          await createVectorStore_JSON(
-            JSONData,
-            dbData._id.toString(),
-            vectorStore
-          );
-
-          const uploadFolderPath = path.join(__dirname, "../uploads");
-          const directoryPath = uploadFolderPath + "/" + file.filename;
-          fs.unlink(directoryPath, (err) => {
-            if (err) throw err;
-          });
-        } catch (err) {
-          console.log(err);
-          // throw err;
-          return res.status(500).json({ message: "Internal server error" });
-        }
-      })
-    );
-    await storeVectorData(vectorStore);
-    const rows = await getAllRows();
-    return res.json({ data: rows });
-  } else {
-    return res.status(500).json({ message: "No file is selected." });
-  }
-};
-
-exports.deleteDataset = async (req, res, next) => {
-  const id = req.body.id;
-  try {
-    const pinecone = new PineconeClient();
-    await pinecone.init({
-      apiKey: process.env.PINECONE_API_KEY,
-      environment: process.env.PINECONE_ENVIRONMENT,
-    });
-    const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX);
-    const deleteRequest = {
-      filter: { id: id },
-      namespace: process.env.PINECONE_NAMESPACE,
-    };
-    pineconeIndex._delete({ deleteRequest });
-    const list = await deleteRows(id);
-    return res.json({ data: list });
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Internal server error" });
   }
 };
 
@@ -250,47 +130,166 @@ exports.getReply = async (req, res, next) => {
   }
 };
 
-async function insertRow(name) {
+exports.deleteDataset = async (req, res, next) => {
+  const id = req.body.id;
   try {
-    const newRow = await Chatbot.create({ name: name });
-    return newRow;
-  } catch (error) {
-    console.error(error);
+    const pinecone = new PineconeClient();
+    await pinecone.init({
+      apiKey: process.env.PINECONE_API_KEY,
+      environment: process.env.PINECONE_ENVIRONMENT,
+    });
+    const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX);
+    const deleteRequest = {
+      filter: { id: id },
+      namespace: process.env.PINECONE_NAMESPACE,
+    };
+    pineconeIndex._delete({ deleteRequest });
+    await Chatbot.deleteOne({ _id: id });
+    let list = await Chatbot.find({ trainflag: true });
+    return res.status(200).json({ data: list });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Internal server error" });
   }
-}
+};
 
-async function createVectorStore_file(file, id, vectorStore) {
-  let loader;
-  const ext = file.filename.split(".")[1];
-  if (ext === "pdf") {
-    loader = new PDFLoader("uploads/" + file.filename, { splitPages: false });
-  } else if (ext === "doc" || ext === "docx") {
-    loader = new DocxLoader("uploads/" + file.filename);
-  } else if (ext === "txt") {
-    loader = new TextLoader("uploads/" + file.filename);
-  } else if (ext === "csv") {
-    loader = new CSVLoader("uploads/" + file.filename);
-  } else if (ext === "xls" || ext === "xlsx") {
-    const temp = await handleXlsxFile(file, id);
-    return temp;
-  } else {
-    return;
+exports.trainbot = async (req, res, next) => {
+  const { links } = req.body;
+  const files = req.files;
+  let vectorStore = [];
+  let idlist = [];
+  try {
+    if (files) {
+      await Promise.all(
+        files.map(async (file) => {
+          const newRow = await Chatbot.create({
+            name: file.originalname,
+            trainflag: false,
+          });
+          idlist.push(newRow._id);
+          let loader;
+          let pageContent = null;
+          const ext = file.filename.split(".")[1];
+          const loaders = {
+            pdf: PDFLoader,
+            doc: DocxLoader,
+            docx: DocxLoader,
+            txt: TextLoader,
+          };
+
+          if (ext in loaders) {
+            loader = new loaders[ext]("uploads/" + file.filename);
+          }
+
+          const contentLoaders = {
+            csv: async () => {
+              const directoryPath = "uploads/" + file.filename;
+              const fileData = await readFileAsync(directoryPath, "utf8");
+              const result = Papa.parse(fileData, { header: true });
+              return JSON.stringify(result.data);
+            },
+            xls: xlsContentLoader,
+            xlsx: xlsContentLoader,
+          };
+
+          if (ext in contentLoaders) {
+            pageContent = await contentLoaders[ext]();
+          }
+
+          if (loader) {
+            const docs = await loader.load();
+            pageContent = docs[0].pageContent;
+          }
+
+          if (pageContent) {
+            await splitContent(pageContent, newRow._id, vectorStore);
+          }
+
+          const directoryPath = "uploads/" + file.filename;
+          await unlinkAsync(directoryPath);
+        })
+      );
+    }
+
+    if (links) {
+      await Promise.all(
+        links.map(async (link) => {
+          const newRow = await Chatbot.create({
+            name: link,
+            trainflag: false,
+          });
+          idlist.push(newRow._id);
+
+          const browser = await puppeteer.launch({
+            headless: "new",
+            args: ["--no-sandbox"],
+          });
+          const page = await browser.newPage();
+
+          await page.goto(link, {
+            waitUntil: "domcontentloaded",
+            timeout: 0,
+          });
+
+          const pageContent = await page.evaluate(() => {
+            const scripts = document.body.querySelectorAll("script");
+            const noscript = document.body.querySelectorAll("noscript");
+            const styles = document.body.querySelectorAll("style");
+            const scriptAndStyle = [...scripts, ...noscript, ...styles];
+            scriptAndStyle.forEach((e) => e.remove());
+
+            const mainElement = document.querySelector("main");
+            return mainElement
+              ? mainElement.innerText
+              : document.body.innerText;
+          });
+
+          if (pageContent)
+            await splitContent(pageContent, newRow._id, vectorStore);
+
+          await browser.close();
+        })
+      );
+    }
+
+    if (vectorStore) {
+      const pinecone = new PineconeClient();
+      await pinecone.init({
+        apiKey: process.env.PINECONE_API_KEY,
+        environment: process.env.PINECONE_ENVIRONMENT,
+      });
+      const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX);
+      await PineconeStore.fromDocuments(vectorStore, new OpenAIEmbeddings(), {
+        pineconeIndex,
+        maxConcurrency: 5,
+        namespace: process.env.PINECONE_NAMESPACE,
+      });
+    }
+
+    const itemIds = idlist.map((item) => item);
+
+    await Chatbot.updateMany(
+      { _id: { $in: itemIds } },
+      { $set: { trainflag: true } }
+    );
+    rows = await Chatbot.find({ trainflag: true });
+
+    return res.status(200).json({ data: rows });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Internal server error" });
   }
-  const docs = await loader.load();
-  const output = await splitContent(docs[0].pageContent, id, vectorStore);
-  return output;
-}
+};
 
-async function handleXlsxFile(file, id, vectorStore) {
+async function xlsContentLoader() {
   const workbook = xlsx.readFile("uploads/" + file.filename);
-  let workbook_sheet = workbook.SheetNames;
-  let res = xlsx.utils.sheet_to_json(workbook.Sheets[workbook_sheet[0]]);
-  let temp = "";
+  const workbookSheet = workbook.SheetNames;
+  const res = xlsx.utils.sheet_to_json(workbook.Sheets[workbookSheet[0]]);
+  let content = "";
   for (let i = 0; i < res.length; i++) {
-    temp.concat(JSON.stringify(res[i]).replaceAll(",", "\n"));
+    content += JSON.stringify(res[i]).replaceAll(",", "\n");
   }
-  const output = await splitContent(temp, id, vectorStore);
-  return output;
+  return content;
 }
 
 async function splitContent(pageContent, id, vectorStore) {
@@ -305,115 +304,10 @@ async function splitContent(pageContent, id, vectorStore) {
       new Document({
         metadata: {
           ...item.metadata,
-          id: id,
+          id: id.toString(),
         },
         pageContent: item.pageContent,
       })
     );
   });
-}
-
-async function storeVectorData(docs) {
-  if (docs) {
-    const pinecone = new PineconeClient();
-    await pinecone.init({
-      apiKey: process.env.PINECONE_API_KEY,
-      environment: process.env.PINECONE_ENVIRONMENT,
-    });
-    const pineconeIndex = pinecone.Index(process.env.PINECONE_INDEX);
-    PineconeStore.fromDocuments(docs, new OpenAIEmbeddings(), {
-      pineconeIndex,
-      maxConcurrency: 5,
-      namespace: process.env.PINECONE_NAMESPACE,
-    });
-  }
-}
-
-async function getAllRows() {
-  try {
-    const rows = await Chatbot.find({});
-    let list = [];
-    if (rows) {
-      rows.map((item) => {
-        list.push({ name: item.name, _id: item._id });
-      });
-    }
-    return list;
-  } catch (error) {
-    console.error(error);
-  }
-}
-
-async function deleteRows(id) {
-  try {
-    await Chatbot.deleteOne({ _id: id });
-    const list = await getAllRows();
-    return list;
-  } catch (err) {
-    console.log(err);
-  }
-}
-
-async function trainingFromLinks(links) {
-  if (links) {
-    let vectorStore = [];
-    await Promise.all(
-      links.map(async (link) => {
-        try {
-          const dbData = await insertRow(link);
-          await createVectorStore_link(
-            link,
-            dbData._id.toString(),
-            vectorStore
-          );
-        } catch (err) {
-          console.log(err);
-          throw err;
-        }
-      })
-    );
-    await storeVectorData(vectorStore);
-  }
-  return;
-}
-
-async function createVectorStore_link(link, id, vectorStore) {
-  const browser = await puppeteer.launch({
-    headless: "new",
-    args: ["--no-sandbox"],
-  });
-  const page = await browser.newPage();
-
-  await page.goto(link, {
-    waitUntil: "domcontentloaded",
-    timeout: 0,
-  });
-
-  const docs = await page.evaluate(() => {
-    const scripts = document.body.querySelectorAll("script");
-    const noscript = document.body.querySelectorAll("noscript");
-    const styles = document.body.querySelectorAll("style");
-    const scriptAndStyle = [...scripts, ...noscript, ...styles];
-    scriptAndStyle.forEach((e) => e.remove());
-
-    const mainElement = document.querySelector("main");
-    return mainElement ? mainElement.innerText : document.body.innerText;
-  });
-
-  let output = null;
-  if (docs) output = await splitContent(docs, id, vectorStore);
-  return output;
-}
-
-async function detectingCSV(file) {
-  const uploadFolderPath = path.join(__dirname, "../uploads");
-  const directoryPath = uploadFolderPath + "/" + file.filename;
-  const fileData = fs.readFileSync(directoryPath, "utf8");
-  const result = Papa.parse(fileData, { header: true });
-  return result.data;
-}
-
-async function createVectorStore_JSON(JSONData, id, vectorStore) {
-  const output = await splitContent(JSON.stringify(JSONData), id, vectorStore);
-  return output;
 }

@@ -24,7 +24,6 @@ const upload = multer({
       file.mimetype == "application/msword" ||
       file.mimetype ==
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      file.mimetype == "text/csv" ||
       file.mimetype == "application/vnd.ms-excel" ||
       file.mimetype ==
         "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
@@ -34,7 +33,7 @@ const upload = multer({
       cb(null, false);
       return cb(
         new Error(
-          "Only .pdf, .txt, .doc, .docx, .csv, .xls and .xlsx format allowed!"
+          "Only .pdf, .txt, .doc, .docx, .xls and .xlsx format allowed!"
         )
       );
     }
@@ -44,18 +43,7 @@ const upload = multer({
 router.post("/getsitemap", chatbotController.getSitemap);
 router.get("/getDataset", chatbotController.getDataset);
 router.post("/deleteDataset", chatbotController.deleteDataset);
-router.post(
-  "/training/files",
-  upload.array("files"),
-  chatbotController.training_files
-);
-router.post("/training/links", chatbotController.training_links);
-router.post("/training/sitemap", chatbotController.training_sitemap);
-router.post(
-  "/training/FAQs",
-  upload.array("files"),
-  chatbotController.training_FAQs
-);
 router.post("/wamsg", chatbotController.getReply);
+router.post("/train", upload.array("files"), chatbotController.trainbot);
 
 module.exports = router;

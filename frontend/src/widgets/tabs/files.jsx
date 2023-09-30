@@ -29,7 +29,7 @@ export function FilesTab(props) {
     }
 
     axios
-      .post(`${process.env.REACT_APP_BASED_URL}/training/files`, formData)
+      .post(`${process.env.REACT_APP_BASED_URL}/train`, formData)
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });
@@ -82,7 +82,7 @@ export function FilesTab(props) {
               Click to upload a file or drag and drop it here
             </p>
             <p className="text-xs text-gray-500 dark:text-gray-400">
-              Up to 100MB in size. PDF, DOC, DOCX
+              Up to 100MB in size. PDF, DOC, DOCX, TEXT
             </p>
           </div>
           <input

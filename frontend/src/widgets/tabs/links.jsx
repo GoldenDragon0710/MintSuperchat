@@ -37,7 +37,7 @@ export function LinksTab(props) {
     }
 
     apiClient
-      .post("/training/links", { links: list })
+      .post("/train", { links: list })
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });

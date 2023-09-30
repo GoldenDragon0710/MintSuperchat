@@ -151,7 +151,7 @@ export function SitemapsTab(props) {
 
     setLoading(true);
     apiClient
-      .post("/training/sitemap", { links: list })
+      .post("/train", { links: list })
       .then((res) => {
         props.setDataset(res.data.data);
         notification.success({ message: "Successfully trained." });
