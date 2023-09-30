@@ -15,8 +15,8 @@ process.setMaxListeners(0);
 const chatbotRouter = require("./routers/chatbotRouter");
 
 // Set up bodyParser middleware
-app.use(bodyParser.urlencoded({ limit: '100MB', extended: true }));
-app.use(bodyParser.json({ limit: '100MB' }));
+app.use(bodyParser.urlencoded({ limit: "100MB", extended: true }));
+app.use(bodyParser.json({ limit: "100MB" }));
 
 app.use("/api/chatbot", chatbotRouter);
 
@@ -27,15 +27,10 @@ app.use((err, req, res, next) => {
 });
 
 // Connect to MongoDB and start the server
-mongoose
-  .connect(process.env.MONGO_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-  })
-  .then(() => {
-    console.log("Connected to MongoDB");
-    app.listen(process.env.PORT, () => {
-      console.log(`Server started on port ${process.env.PORT}`);
-    });
-  })
-  .catch((err) => console.error(err));
+
+const connectDB = require("./app/config/db.config");
+connectDB();
+
+app.listen(PORT, () => {
+  console.log(`Server is running on port ${process.env.PORT}.`);
+});
