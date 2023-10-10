@@ -73,9 +73,7 @@ const getSitemap = async (req, res) => {
   }
 };
 
-const getReply = async (req, res) => {
-  const message = req.body.Body;
-
+const getReply = async (message) => {
   const client = new PineconeClient();
   await client.init({
     apiKey: process.env.PINECONE_API_KEY,
@@ -120,14 +118,7 @@ const getReply = async (req, res) => {
     question: message,
     chat_history: [],
   });
-  try {
-    const twiml = new twilio.twiml.MessagingResponse();
-    twiml.message(result.text);
-    res.send(twiml.toString());
-  } catch (err) {
-    console.log(err);
-    return res.status(500).json({ message: "Internal server error" });
-  }
+  return result.text;
 };
 
 const deleteDataset = async (req, res) => {

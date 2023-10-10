@@ -1,10 +1,31 @@
 const express = require("express");
 const cors = require("cors");
+const qrcode = require("qrcode-terminal");
+const { Client } = require("whatsapp-web.js");
+const chatbotcontroller = require("./controllers/chatbotController");
 const mongoose = require("mongoose");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 
 const app = express();
+const client = new Client();
+
+client.on("qr", (qr) => {
+  qrcode.generate(qr, { small: true });
+});
+
+client.on("ready", () => {
+  console.log("Client is ready!");
+});
+
+client.on("message", async (message) => {
+  if (message.body != "") {
+    const reply = await chatbotcontroller.getReply(message.body);
+    message.reply(reply);
+  }
+});
+
+client.initialize();
 
 // Middleware
 app.use(cors());
