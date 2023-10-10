@@ -13,7 +13,6 @@ const xlsx = require("xlsx");
 const Papa = require("papaparse");
 const fs = require("fs");
 const puppeteer = require("puppeteer");
-const twilio = require("twilio");
 const { promisify } = require("util");
 const readFileAsync = promisify(fs.readFile);
 const unlinkAsync = promisify(fs.unlink);
