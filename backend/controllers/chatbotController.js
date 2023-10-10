@@ -30,7 +30,7 @@ const getDataset = async (req, res) => {
 
 const getSitemap = async (req, res) => {
   const browser = await puppeteer.launch({
-    headless: "new",
+    headless: "true",
     args: ["--no-sandbox"],
   });
   const page = await browser.newPage();
