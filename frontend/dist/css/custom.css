@@ -1,0 +1,11 @@
+input {
+  background-color: white !important;
+  border: unset !important;
+}
+input:disabled {
+  background-color: #cbcbcb !important;
+}
+
+.custom-input label {
+  display: none !important;
+}

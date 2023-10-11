@@ -8,7 +8,7 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 
 const app = express();
-const client = new Client();
+const client = new Client({ puppeteer: { args: [] } });
 
 client.on("qr", (qr) => {
   qrcode.generate(qr, { small: true });
