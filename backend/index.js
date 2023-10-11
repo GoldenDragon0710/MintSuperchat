@@ -8,24 +8,6 @@ const bodyParser = require("body-parser");
 require("dotenv").config();
 
 const app = express();
-const client = new Client({ puppeteer: { args: [] } });
-
-client.on("qr", (qr) => {
-  qrcode.generate(qr, { small: true });
-});
-
-client.on("ready", () => {
-  console.log("Client is ready!");
-});
-
-client.on("message", async (message) => {
-  if (message.body != "") {
-    const reply = await chatbotcontroller.getReply(message.body);
-    message.reply(reply);
-  }
-});
-
-client.initialize();
 
 // Middleware
 app.use(cors());
@@ -46,6 +28,25 @@ app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Internal server error" });
 });
+
+const client = new Client();
+
+client.on("qr", (qr) => {
+  qrcode.generate(qr, { small: true });
+});
+
+client.on("ready", () => {
+  console.log("Client is ready!");
+});
+
+client.on("message", async (message) => {
+  if (message.body != "") {
+    const reply = await chatbotcontroller.getReply(message.body);
+    message.reply(reply);
+  }
+});
+
+client.initialize();
 
 // Connect to MongoDB and start the server
 
