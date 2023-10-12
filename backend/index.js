@@ -29,7 +29,11 @@ app.use((err, req, res, next) => {
   res.status(500).json({ message: "Internal server error" });
 });
 
-const client = new Client();
+const client = new Client({
+  puppeteer: {
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  },
+});
 
 client.on("qr", (qr) => {
   qrcode.generate(qr, { small: true });
