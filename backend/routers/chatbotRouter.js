@@ -42,6 +42,7 @@ const upload = multer({
 });
 
 router.post("/getsitemap", chatbotController.getSitemap);
+router.get("/getQRCode", chatbotController.getQRCode);
 router.get("/getDataset", chatbotController.getDataset);
 router.post("/deleteDataset", chatbotController.deleteDataset);
 router.post("/wamsg", chatbotController.getReply);

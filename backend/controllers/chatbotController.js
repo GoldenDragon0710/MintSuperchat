@@ -16,12 +16,48 @@ const puppeteer = require("puppeteer");
 const { promisify } = require("util");
 const readFileAsync = promisify(fs.readFile);
 const unlinkAsync = promisify(fs.unlink);
+const { Client } = require("whatsapp-web.js");
 require("dotenv").config();
 
 const getDataset = async (req, res) => {
   try {
     const rows = await Chatbot.find({ trainflag: true });
     return res.status(200).json({ data: rows });
+  } catch (err) {
+    console.log(err);
+    return res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+const getQRCode = async (req, res) => {
+  try {
+    const client = new Client({
+      puppeteer: {
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      },
+    });
+    res.setHeader("Content-Type", "text/event-stream");
+    res.setHeader("Cache-Control", "no-cache");
+    res.setHeader("Connection", "keep-alive");
+
+    client.on("qr", (qr_data) => {
+      res.write(`data: ${qr_data}\n\n`);
+    });
+
+    client.on("ready", () => {
+      console.log("Client is ready!");
+      res.write(`id: CLOSE\n\n`);
+      res.end();
+    });
+
+    client.on("message", async (message) => {
+      if (message.body != "") {
+        const reply = await chatbotcontroller.getReply(message.body);
+        message.reply(reply);
+      }
+    });
+
+    client.initialize();
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
@@ -305,6 +341,7 @@ async function splitContent(pageContent, id, vectorStore) {
 module.exports = {
   getDataset,
   getSitemap,
+  getQRCode,
   getReply,
   deleteDataset,
   trainbot,
