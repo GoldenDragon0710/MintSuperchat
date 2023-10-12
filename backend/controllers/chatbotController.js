@@ -20,9 +20,8 @@ require("dotenv").config();
 
 const getDataset = async (req, res) => {
   try {
-    return res.status(500).json({ message: "Internal server error" });
-    // const rows = await Chatbot.find({ trainflag: true });
-    // return res.status(200).json({ data: rows });
+    const rows = await Chatbot.find({ trainflag: true });
+    return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
