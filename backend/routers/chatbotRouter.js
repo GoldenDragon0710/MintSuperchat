@@ -1,5 +1,7 @@
 const express = require("express");
 const chatbotController = require("../controllers/chatbotController");
+const userController = require("../controllers/userController");
+const datasetController = require("../controllers/datasetController");
 const router = express.Router();
 const multer = require("multer");
 const { v4: uuidv4 } = require("uuid");
@@ -41,11 +43,19 @@ const upload = multer({
   },
 });
 
-router.post("/getsitemap", chatbotController.getSitemap);
-router.get("/getQRCode", chatbotController.getQRCode);
-router.get("/getDataset", chatbotController.getDataset);
-router.post("/deleteDataset", chatbotController.deleteDataset);
-router.post("/wamsg", chatbotController.getReply);
-router.post("/train", upload.array("files"), chatbotController.trainbot);
+router.post("/getsitemap", datasetController.getSitemap);
+router.post("/getQRCode", datasetController.getQRCode);
+router.post("/getDataset", datasetController.getDataset);
+router.post("/deleteDataset", datasetController.deleteDataset);
+router.post("/train", upload.array("files"), datasetController.trainbot);
+
+router.get("/getUsers", userController.getUsers);
+router.post("/updateUser", userController.updateUser);
+router.post("/deleteUser", userController.deleteUser);
+
+router.post("/getChatbots", chatbotController.getChatbots);
+router.post("/addChatbot", chatbotController.addChatbot);
+router.post("/updateChatbot", chatbotController.updateChatbot);
+router.post("/deleteChatbot", chatbotController.deleteChatbot);
 
 module.exports = router;

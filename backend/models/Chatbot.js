@@ -2,8 +2,8 @@ const mongoose = require("mongoose");
 
 const chatbotSchema = new mongoose.Schema(
   {
-    name: String,
-    trainflag: Boolean,
+    userId: String,
+    title: String,
   },
   { timestamps: true }
 );

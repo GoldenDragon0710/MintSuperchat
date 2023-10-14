@@ -1,8 +1,9 @@
-input {
+.custom-input input {
   background-color: white !important;
   border: unset !important;
+  font-size: 16px;
 }
-input:disabled {
+.custom-input input:disabled {
   background-color: #cbcbcb !important;
 }
 
