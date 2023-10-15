@@ -21,7 +21,7 @@ const updateUser = async (req, res) => {
       if (title) {
         updateObj.title = title;
       }
-      await User.updateOne({ _id: id, $set: updateObj });
+      await User.updateOne({ _id: id }, { $set: updateObj });
     }
     const rows = await User.find();
     return res.status(200).json({ data: rows });

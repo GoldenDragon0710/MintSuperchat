@@ -4,6 +4,7 @@ const chatbotSchema = new mongoose.Schema(
   {
     userId: String,
     title: String,
+    active: Boolean,
   },
   { timestamps: true }
 );

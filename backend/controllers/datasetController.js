@@ -18,6 +18,7 @@ const { promisify } = require("util");
 const readFileAsync = promisify(fs.readFile);
 const unlinkAsync = promisify(fs.unlink);
 const { Client } = require("whatsapp-web.js");
+const Chatbot = require("../models/Chatbot");
 require("dotenv").config();
 
 const getDataset = async (req, res) => {
@@ -62,8 +63,11 @@ const getQRCode = async (req, res) => {
       if (message.body != "") {
         const row = await User.findOne({ phone: phone });
         if (row.active) {
-          const reply = await getReply(message.body);
-          message.reply(reply);
+          const row = await Chatbot.findOne({ active: true });
+          if (row) {
+            const reply = await getReply(message.body, row._id);
+            message.reply(reply);
+          }
         }
       }
     });
@@ -119,7 +123,7 @@ const getSitemap = async (req, res) => {
   }
 };
 
-const getReply = async (message) => {
+const getReply = async (message, namespaceId) => {
   const client = new PineconeClient();
   await client.init({
     apiKey: process.env.PINECONE_API_KEY,
@@ -129,7 +133,7 @@ const getReply = async (message) => {
 
   const vectorStore = await PineconeStore.fromExistingIndex(
     new OpenAIEmbeddings({ openAIApiKey: process.env.OPENAI_API_KEY }),
-    { pineconeIndex, namespace: botId }
+    { pineconeIndex, namespace: namespaceId }
   );
 
   const CONDENSE_PROMPT = `Rephrase the follow up question to be a standalone question.

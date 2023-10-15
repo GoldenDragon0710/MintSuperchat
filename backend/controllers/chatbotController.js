@@ -1,5 +1,8 @@
+const { PineconeClient } = require("@pinecone-database/pinecone");
 const Chatbot = require("../models/Chatbot");
 const User = require("../models/User");
+const Dataset = require("../models/Dataset");
+require("dotenv").config();
 
 const getChatbots = async (req, res) => {
   try {
@@ -15,7 +18,7 @@ const getChatbots = async (req, res) => {
 const addChatbot = async (req, res) => {
   try {
     const { userId, title } = req.body;
-    await Chatbot.create({ userId: userId, title: title });
+    await Chatbot.create({ userId: userId, title: title, active: false });
     const botCountrow = await User.findById(userId);
     await User.updateOne(
       { _id: userId },
@@ -31,16 +34,22 @@ const addChatbot = async (req, res) => {
 
 const updateChatbot = async (req, res) => {
   try {
-    const { id, userId, title } = req.body;
-    if (userId || title) {
+    const { id, userId, title, active, currentActiveId } = req.body;
+    if (userId || title || active) {
       const updateObj = {};
-      if (userId) {
-        updateObj.userId = userId;
-      }
       if (title) {
         updateObj.title = title;
       }
-      await User.updateOne({ _id: id }, { $set: updateObj });
+      if (active) {
+        updateObj.active = active;
+      }
+      await Chatbot.updateOne({ _id: id }, { $set: updateObj });
+    }
+    if (currentActiveId) {
+      await Chatbot.updateOne(
+        { _id: currentActiveId },
+        { $set: { active: false } }
+      );
     }
     const rows = await Chatbot.find({ userId: userId });
     return res.status(200).json({ data: rows });
@@ -59,6 +68,16 @@ const deleteChatbot = async (req, res) => {
       { $set: { botCount: userRow.botCount - 1 } }
     );
     await Chatbot.deleteOne({ _id: id });
+    await Dataset.deleteMany({ botId: id });
+
+    const client = new PineconeClient();
+    await client.init({
+      apiKey: process.env.PINECONE_API_KEY,
+      environment: process.env.PINECONE_ENVIRONMENT,
+    });
+    const pineconeIndex = client.Index(process.env.PINECONE_INDEX);
+    await pineconeIndex.delete1({ namespace: id, deleteAll: true });
+
     const rows = await Chatbot.find({ userId: userId });
     return res.status(200).json({ data: rows });
   } catch (err) {
