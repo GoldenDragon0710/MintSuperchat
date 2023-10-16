@@ -5,7 +5,6 @@ const userSchema = new mongoose.Schema(
     title: String,
     phone: String,
     botCount: Number,
-    active: Boolean,
   },
   { timestamps: true }
 );

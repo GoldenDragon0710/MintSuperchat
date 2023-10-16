@@ -48,26 +48,26 @@ const getQRCode = async (req, res) => {
 
     client.on("ready", async () => {
       console.log("Client is ready!");
-      const time = new Date();
-      const title = `bot-${time.getFullYear()}${time.getMonth()}${time.getDate()}${time.getHours()}${time.getMinutes()}${time.getSeconds()}`;
+      const title = `bot-${phone}`;
       await User.create({
         title: title,
         phone: phone,
         botCount: 0,
-        active: false,
       });
       res.end();
     });
 
     client.on("message", async (message) => {
       if (message.body != "") {
-        const row = await User.findOne({ phone: phone });
-        if (row.active) {
-          const row = await Chatbot.findOne({ active: true });
-          if (row) {
-            const reply = await getReply(message.body, row._id);
-            message.reply(reply);
-          }
+        const userRow = await User.findOne({ phone: phone });
+        const userId = userRow._id.toString();
+        const botRow = await Chatbot.findOne({
+          userId: { $in: userId },
+          active: true,
+        });
+        if (botRow) {
+          const reply = await getReply(message.body, botRow._id);
+          message.reply(reply);
         }
       }
     });
