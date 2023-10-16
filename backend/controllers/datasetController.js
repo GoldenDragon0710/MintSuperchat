@@ -34,16 +34,31 @@ const getDataset = async (req, res) => {
 
 const getQRCode = async (req, res) => {
   const { phone } = req.body;
+  console.log("-------------------------", phone);
+
   try {
     const client = new Client({
       puppeteer: {
         args: ["--no-sandbox", "--disable-setuid-sandbox"],
       },
     });
-    res.writeHead(200, { "Content-Type": "text/plain" });
+
+    const sendData = (data) => {
+      const responseData = {
+        data: data,
+      };
+      res.write(`data: ${JSON.stringify(responseData)}\n\n`);
+    };
+
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
+    });
 
     client.on("qr", (qr_data) => {
-      res.write(qr_data);
+      sendData(qr_data);
     });
 
     client.on("ready", async () => {
@@ -54,6 +69,7 @@ const getQRCode = async (req, res) => {
         phone: phone,
         botCount: 0,
       });
+      sendData("[DONE]");
       res.end();
     });
 
