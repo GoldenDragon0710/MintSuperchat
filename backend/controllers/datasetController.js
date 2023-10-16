@@ -34,7 +34,6 @@ const getDataset = async (req, res) => {
 
 const getQRCode = async (req, res) => {
   const { phone } = req.body;
-  console.log("-------------------------", phone);
 
   try {
     const client = new Client({
