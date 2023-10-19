@@ -34,14 +34,13 @@ const getDataset = async (req, res) => {
 
 const getQRCode = async (req, res) => {
   const { phone } = req.body;
-
   try {
-    const client = new Client({
-      puppeteer: {
-        args: ["--no-sandbox", "--disable-setuid-sandbox"],
-      },
+    res.writeHead(200, {
+      "Content-Type": "text/event-stream",
+      "Cache-Control": "no-cache, no-transform",
+      Connection: "keep-alive",
+      "X-Accel-Buffering": "no",
     });
-
     const sendData = (data) => {
       const responseData = {
         data: data,
@@ -49,11 +48,15 @@ const getQRCode = async (req, res) => {
       res.write(`data: ${JSON.stringify(responseData)}\n\n`);
     };
 
-    res.writeHead(200, {
-      "Content-Type": "text/event-stream",
-      "Cache-Control": "no-cache, no-transform",
-      Connection: "keep-alive",
-      "X-Accel-Buffering": "no",
+    const isExists = await User.findOne({ phone: phone });
+    if (isExists) {
+      sendData("[DoublePhone]");
+    }
+
+    const client = new Client({
+      puppeteer: {
+        args: ["--no-sandbox", "--disable-setuid-sandbox"],
+      },
     });
 
     client.on("qr", (qr_data) => {
