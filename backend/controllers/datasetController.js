@@ -21,6 +21,17 @@ const { Client } = require("whatsapp-web.js");
 const Chatbot = require("../models/Chatbot");
 require("dotenv").config();
 
+const sysPrompt = `Only answer the user's question if it is related to the topics covered in the trained datasets.
+If the question is out-of-domain or unrelated to the trained data, do not attempt to generate an answer. 
+Instead, politely inform the user that you cannot answer their question.
+
+When answering in-domain questions:
+- Only use information from the retrieved documents to generate the response. Do not rely on any outside knowledge.
+- Generate responses that are clear, concise, and directly address the user's question.
+- Do not include any unnecessary details or tangents unrelated to the question.
+- If multiple relevant documents are retrieved, synthesize the key points into a coherent answer.
+- Make sure the response sounds natural and human. Do not repeat verbatim passages from retrieved documents.`;
+
 const getDataset = async (req, res) => {
   try {
     const { botId } = req.body;
@@ -186,8 +197,7 @@ const getReply = async (message, namespaceId) => {
   const result = await chain.call({
     question: message,
     chat_history: [],
-    context:
-      "In this case, do not respond to it and encourage the user to stay in the your knowledge base if the user asks a question that is outside your knowledge base.",
+    context: sysPrompt,
   });
   return result.text;
 };
