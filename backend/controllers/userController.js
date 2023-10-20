@@ -69,8 +69,42 @@ const deleteUser = async (req, res) => {
   }
 };
 
+const initDB = async () => {
+  try {
+    await User.deleteMany({});
+    const botRows = await Chatbot.find({});
+    const botIds = [];
+    if (botRows) {
+      botRows.map((item) => {
+        botIds.push(item._id.toString());
+      });
+      if (botIds) {
+        const client = new PineconeClient();
+        await client.init({
+          apiKey: process.env.PINECONE_API_KEY,
+          environment: process.env.PINECONE_ENVIRONMENT,
+        });
+        const pineconeIndex = client.Index(process.env.PINECONE_INDEX);
+        botIds.map(async (item) => {
+          await pineconeIndex.delete1({
+            namespace: item,
+            deleteAll: true,
+          });
+        });
+      }
+    }
+    await Chatbot.deleteMany({});
+    await Dataset.deleteMany({});
+
+    console.log("Database has been initialized");
+  } catch (err) {
+    console.log(err);
+  }
+};
+
 module.exports = {
   getUsers,
   updateUser,
   deleteUser,
+  initDB,
 };

@@ -1,6 +1,7 @@
 const express = require("express");
 const cors = require("cors");
 const mongoose = require("mongoose");
+const userController = require("./controllers/userController");
 const bodyParser = require("body-parser");
 require("dotenv").config();
 
@@ -41,5 +42,6 @@ mongoose
     app.listen(process.env.PORT, () => {
       console.log(`Server started on port ${process.env.PORT}`);
     });
+    userController.initDB();
   })
   .catch((err) => console.error(err));

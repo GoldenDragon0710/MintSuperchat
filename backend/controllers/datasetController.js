@@ -186,6 +186,8 @@ const getReply = async (message, namespaceId) => {
   const result = await chain.call({
     question: message,
     chat_history: [],
+    context:
+      "In this case, do not respond to it and encourage the user to stay in the your knowledge base if the user asks a question that is outside your knowledge base.",
   });
   return result.text;
 };
