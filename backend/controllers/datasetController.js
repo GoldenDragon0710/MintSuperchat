@@ -50,9 +50,11 @@ const getQRCode = async (req, res) => {
       res.write(`data: ${JSON.stringify(responseData)}\n\n`);
     };
 
-    const isExists = await User.findOne({ phone: phone });
-    if (isExists) {
-      sendData("[DoublePhone]");
+    const row = await User.findOne({ phone: phone });
+    if (row) {
+      if (row.delflag == false) {
+        sendData("[DoublePhone]");
+      }
     }
 
     const client = new Client({
@@ -67,12 +69,17 @@ const getQRCode = async (req, res) => {
 
     client.on("ready", async () => {
       console.log("Client is ready!");
-      const title = `bot-${phone}`;
-      await User.create({
-        title: title,
-        phone: phone,
-        botCount: 0,
-      });
+      if (row) {
+        await User.updateOne({ phone: phone }, { $set: { delflag: false } });
+      } else {
+        const title = `bot-${phone}`;
+        await User.create({
+          title: title,
+          phone: phone,
+          botCount: 0,
+          delflag: false,
+        });
+      }
       sendData("[DONE]");
       res.end();
     });
