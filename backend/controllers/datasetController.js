@@ -21,16 +21,7 @@ const { Client } = require("whatsapp-web.js");
 const Chatbot = require("../models/Chatbot");
 require("dotenv").config();
 
-const sysPrompt = `Only answer the user's question if it is related to the topics covered in the trained datasets.
-If the question is out-of-domain or unrelated to the trained data, do not attempt to generate an answer. 
-Instead, politely inform the user that you cannot answer their question.
-
-When answering in-domain questions:
-- Only use information from the retrieved documents to generate the response. Do not rely on any outside knowledge.
-- Generate responses that are clear, concise, and directly address the user's question.
-- Do not include any unnecessary details or tangents unrelated to the question.
-- If multiple relevant documents are retrieved, synthesize the key points into a coherent answer.
-- Make sure the response sounds natural and human. Do not repeat verbatim passages from retrieved documents.`;
+const sysPrompt = `You are an AI assistant providing helpful answers based on the context to provide conversational answer without any prior knowledge. You are given the following extracted parts of a long document and a question. If you can't find the answer in the context below, just say "Thank you for your question. I can not help you on this topic. Please look online using a search engine.". You can also ask the user to rephrase the question if you need more context. But don't try to make up an answer. If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context. Answer in a concise or elaborate format as per the intent of the question.`;
 
 const getDataset = async (req, res) => {
   try {
@@ -165,13 +156,14 @@ const getReply = async (message, namespaceId) => {
     { pineconeIndex, namespace: namespaceId }
   );
 
-  const CONDENSE_PROMPT = `Rephrase the follow up question to be a standalone question.
+  const CONDENSE_PROMPT = `Given the following conversation and a follow up question, rephrase the follow up question to be a standalone question.
         Chat History:
         {chat_history}
         Follow Up Input: {question}
         Standalone question:`;
 
   const QA_PROMPT = `
+        ${sysPrompt} 
         =========
         {context}
         =========
@@ -197,7 +189,6 @@ const getReply = async (message, namespaceId) => {
   const result = await chain.call({
     question: message,
     chat_history: [],
-    context: sysPrompt,
   });
   return result.text;
 };
