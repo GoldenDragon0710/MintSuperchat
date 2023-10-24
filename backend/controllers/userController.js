@@ -6,7 +6,7 @@ require("dotenv").config();
 
 const getUsers = async (req, res) => {
   try {
-    const rows = await User.find({ delflag: false });
+    const rows = await User.find();
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -24,7 +24,7 @@ const updateUser = async (req, res) => {
       }
       await User.updateOne({ _id: id }, { $set: updateObj });
     }
-    const rows = await User.find({ delflag: false });
+    const rows = await User.find();
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -61,7 +61,7 @@ const deleteUser = async (req, res) => {
       }
     }
 
-    const rows = await User.find({ delflag: false });
+    const rows = await User.find();
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
