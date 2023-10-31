@@ -35,7 +35,7 @@ const getDataset = async (req, res) => {
 };
 
 const getQRCode = async (req, res) => {
-  const { phone } = req.body;
+  const { phone, projectName } = req.body;
   try {
     res.writeHead(200, {
       "Content-Type": "text/event-stream",
@@ -72,9 +72,8 @@ const getQRCode = async (req, res) => {
       if (row) {
         await User.updateOne({ phone: phone }, { $set: { delflag: false } });
       } else {
-        const title = `bot-${phone}`;
         await User.create({
-          title: title,
+          title: projectName,
           phone: phone,
           botCount: 0,
           delflag: false,

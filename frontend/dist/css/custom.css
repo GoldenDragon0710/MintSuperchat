@@ -1,7 +1,7 @@
 .custom-input input {
-  background-color: white !important;
-  border: unset !important;
+  background-color: #eff2f6 !important;
   font-size: 16px;
+  border: 1px solid #17448333 !important;
 }
 .custom-input input:disabled {
   background-color: #cbcbcb !important;
