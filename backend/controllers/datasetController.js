@@ -19,6 +19,7 @@ const readFileAsync = promisify(fs.readFile);
 const unlinkAsync = promisify(fs.unlink);
 const { Client } = require("whatsapp-web.js");
 const Chatbot = require("../models/Chatbot");
+const BlockList = require("../models/Blocklist");
 require("dotenv").config();
 
 const sysPrompt = `You are an AI assistant providing helpful answers based on the context to provide conversational answer without any prior knowledge. You are given the following extracted parts of a long document and a question. If you can't find the answer in the context below, just say "Thank you for your question. I can not help you on this topic. Please look online using a search engine.". You can also ask the user to rephrase the question if you need more context. But don't try to make up an answer. If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context. Answer in a concise or elaborate format as per the intent of the question.`;
@@ -85,15 +86,18 @@ const getQRCode = async (req, res) => {
 
     client.on("message", async (message) => {
       if (message.body != "") {
-        const userRow = await User.findOne({ phone: phone });
-        const userId = userRow._id.toString();
-        const botRow = await Chatbot.findOne({
-          userId: { $in: userId },
-          active: true,
-        });
-        if (botRow) {
-          const reply = await getReply(message.body, botRow._id);
-          message.reply(reply);
+        const isblocked = await BlockList.findOne({ phone: phone });
+        if (isblocked == null) {
+          const userRow = await User.findOne({ phone: phone });
+          const userId = userRow._id.toString();
+          const botRow = await Chatbot.findOne({
+            userId: { $in: userId },
+            active: true,
+          });
+          if (botRow) {
+            const reply = await getReply(message.body, botRow._id);
+            message.reply(reply);
+          }
         }
       }
     });
