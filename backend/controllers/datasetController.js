@@ -86,7 +86,9 @@ const getQRCode = async (req, res) => {
 
     client.on("message", async (message) => {
       if (message.body != "") {
-        const isblocked = await BlockList.findOne({ phone: phone });
+        const senderTxt = message.from;
+        const sender = senderTxt.split("@")[0];
+        const isblocked = await BlockList.findOne({ phone: sender });
         if (isblocked == null) {
           const userRow = await User.findOne({ phone: phone });
           const userId = userRow._id.toString();
@@ -100,6 +102,12 @@ const getQRCode = async (req, res) => {
           }
         }
       }
+    });
+
+    client.on("disconnected", async (reason) => {
+      console.log(`Client was disconnected ${reason}`);
+      await User.updateOne({ phone: phone }, { $set: { delflag: true } });
+      // client.initialize();
     });
 
     client.initialize();
