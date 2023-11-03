@@ -4,6 +4,7 @@ const datasetSchema = new mongoose.Schema(
   {
     botId: String,
     title: String,
+    datasetType: String,
     trainflag: Boolean,
   },
   { timestamps: true }

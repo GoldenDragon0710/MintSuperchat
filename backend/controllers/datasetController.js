@@ -223,7 +223,7 @@ const deleteDataset = async (req, res) => {
 };
 
 const trainbot = async (req, res) => {
-  const { links, botId } = req.body;
+  const { links, botId, datasetType } = req.body;
   const files = req.files;
   let vectorStore = [];
   let idlist = [];
@@ -234,6 +234,7 @@ const trainbot = async (req, res) => {
           const newRow = await Dataset.create({
             botId: botId,
             title: file.originalname,
+            datasetType: datasetType,
             trainflag: false,
           });
           idlist.push(newRow._id);
@@ -287,6 +288,7 @@ const trainbot = async (req, res) => {
           const newRow = await Dataset.create({
             botId: botId,
             title: link,
+            datasetType: datasetType,
             trainflag: false,
           });
           idlist.push(newRow._id);
