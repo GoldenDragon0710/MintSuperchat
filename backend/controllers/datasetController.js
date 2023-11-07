@@ -104,13 +104,14 @@ const getQRCode = async (req, res) => {
       }
     });
 
-    client.on("disconnected", async (reason) => {
-      console.log(`Client was disconnected ${reason}`);
+    client.on("disconnected", async () => {
+      console.log(`Client was disconnected`);
+      client.destroy();
       await User.updateOne({ phone: phone }, { $set: { delflag: true } });
       // client.initialize();
     });
 
-    client.initialize();
+    client.initialize().catch((_) => _);
   } catch (err) {
     console.log(err);
     return res.status(500).json({ message: "Internal server error" });
