@@ -4,7 +4,8 @@ require("dotenv").config();
 
 const getBlockUsers = async (req, res) => {
   try {
-    const rows = await BlockList.find();
+    const { projectID } = req.body;
+    const rows = await BlockList.find({ userID: projectID });
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -14,9 +15,9 @@ const getBlockUsers = async (req, res) => {
 
 const addBlockUser = async (req, res) => {
   try {
-    const { phone, name } = req.body;
-    await BlockList.create({ name: name, phone: phone });
-    const rows = await BlockList.find();
+    const { phone, name, projectID } = req.body;
+    await BlockList.create({ name: name, phone: phone, userID: projectID });
+    const rows = await BlockList.find({ userID: projectID });
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -26,7 +27,7 @@ const addBlockUser = async (req, res) => {
 
 const updateBlockUser = async (req, res) => {
   try {
-    const { id, name, phone } = req.body;
+    const { id, name, phone, projectID } = req.body;
     if (name || phone) {
       const updateObj = {};
       if (name) {
@@ -37,7 +38,7 @@ const updateBlockUser = async (req, res) => {
       }
       await BlockList.updateOne({ _id: id }, { $set: updateObj });
     }
-    const rows = await BlockList.find();
+    const rows = await BlockList.find({ userID: projectID });
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -47,9 +48,9 @@ const updateBlockUser = async (req, res) => {
 
 const deleteBlockUser = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id, projectID } = req.body;
     await BlockList.deleteOne({ _id: id });
-    const rows = await BlockList.find();
+    const rows = await BlockList.find({ userID: projectID });
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);

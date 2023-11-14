@@ -4,6 +4,7 @@ const blocklistSchema = new mongoose.Schema(
   {
     phone: String,
     name: String,
+    userID: String,
   },
   { timestamps: true }
 );

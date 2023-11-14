@@ -59,7 +59,7 @@ router.post("/addChatbot", chatbotController.addChatbot);
 router.post("/updateChatbot", chatbotController.updateChatbot);
 router.post("/deleteChatbot", chatbotController.deleteChatbot);
 
-router.get("/getBlockUsers", blocklistController.getBlockUsers);
+router.post("/getBlockUsers", blocklistController.getBlockUsers);
 router.post("/addBlockUser", blocklistController.addBlockUser);
 router.post("/updateBlockUser", blocklistController.updateBlockUser);
 router.post("/deleteBlockUser", blocklistController.deleteBlockUser);
