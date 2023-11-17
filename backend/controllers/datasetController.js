@@ -14,6 +14,7 @@ const xlsx = require("xlsx");
 const Papa = require("papaparse");
 const fs = require("fs");
 const puppeteer = require("puppeteer");
+const Sitemapper = require("sitemapper");
 const { promisify } = require("util");
 const readFileAsync = promisify(fs.readFile);
 const unlinkAsync = promisify(fs.unlink);
@@ -118,7 +119,7 @@ const getQRCode = async (req, res) => {
   }
 };
 
-const getSitemap = async (req, res) => {
+const getSitemapURL = async (req, res) => {
   const browser = await puppeteer.launch({
     headless: "true",
     args: ["--no-sandbox"],
@@ -159,6 +160,26 @@ const getSitemap = async (req, res) => {
       message: "An error occurred while crawling website.",
     });
     browser.close();
+  }
+};
+
+const getSitemapXML = async (req, res) => {
+  let { URL } = req.body;
+
+  try {
+    if (URL) {
+      const sitemap = new Sitemapper();
+      sitemap.fetch(URL).then(function (sites) {
+        res.status(200).json({
+          data: sites.sites,
+        });
+      });
+    }
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({
+      message: "An error occurred while crawling website.",
+    });
   }
 };
 
@@ -253,7 +274,7 @@ const trainbot = async (req, res) => {
           idlist.push(newRow._id);
           let loader;
           let pageContent = null;
-          const ext = file.filename.split(".")[1];
+          const ext = file.filename.split(".")[-1];
           const loaders = {
             pdf: PDFLoader,
             doc: DocxLoader,
@@ -400,7 +421,8 @@ async function splitContent(pageContent, id, vectorStore) {
 
 module.exports = {
   getDataset,
-  getSitemap,
+  getSitemapURL,
+  getSitemapXML,
   getQRCode,
   deleteDataset,
   trainbot,

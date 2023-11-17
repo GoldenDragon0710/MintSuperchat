@@ -44,7 +44,8 @@ const upload = multer({
   },
 });
 
-router.post("/getsitemap", datasetController.getSitemap);
+router.post("/getsitemapURL", datasetController.getSitemapURL);
+router.post("/getsitemapXML", datasetController.getSitemapXML);
 router.post("/getQRCode", datasetController.getQRCode);
 router.post("/getDataset", datasetController.getDataset);
 router.post("/deleteDataset", datasetController.deleteDataset);
