@@ -2,10 +2,10 @@ const mongoose = require("mongoose");
 
 const userSchema = new mongoose.Schema(
   {
-    title: String,
-    phone: String,
-    botCount: Number,
-    delflag: Boolean,
+    username: String,
+    password: String,
+    email: String,
+    userType: Boolean,
   },
   { timestamps: true }
 );

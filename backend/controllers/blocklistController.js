@@ -1,11 +1,9 @@
-const { PineconeClient } = require("@pinecone-database/pinecone");
 const BlockList = require("../models/Blocklist");
-require("dotenv").config();
 
-const getBlockUsers = async (req, res) => {
+const get = async (req, res) => {
   try {
-    const { projectID } = req.body;
-    const rows = await BlockList.find({ userID: projectID });
+    const { phoneId } = req.body;
+    const rows = await BlockList.find({ phoneId: phoneId });
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -13,11 +11,15 @@ const getBlockUsers = async (req, res) => {
   }
 };
 
-const addBlockUser = async (req, res) => {
+const create = async (req, res) => {
   try {
-    const { phone, name, projectID } = req.body;
-    await BlockList.create({ name: name, phone: phone, userID: projectID });
-    const rows = await BlockList.find({ userID: projectID });
+    const { phone, name, phoneId } = req.body;
+    await BlockList.create({
+      name: name,
+      phone: phone,
+      phoneId: phoneId,
+    });
+    const rows = await BlockList.find({ phoneId: phoneId });
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -25,9 +27,9 @@ const addBlockUser = async (req, res) => {
   }
 };
 
-const updateBlockUser = async (req, res) => {
+const update = async (req, res) => {
   try {
-    const { id, name, phone, projectID } = req.body;
+    const { id, name, phone, phoneId } = req.body;
     if (name || phone) {
       const updateObj = {};
       if (name) {
@@ -38,7 +40,7 @@ const updateBlockUser = async (req, res) => {
       }
       await BlockList.updateOne({ _id: id }, { $set: updateObj });
     }
-    const rows = await BlockList.find({ userID: projectID });
+    const rows = await BlockList.find({ phoneId: phoneId });
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -46,11 +48,11 @@ const updateBlockUser = async (req, res) => {
   }
 };
 
-const deleteBlockUser = async (req, res) => {
+const deleteOne = async (req, res) => {
   try {
-    const { id, projectID } = req.body;
+    const { id, phoneId } = req.body;
     await BlockList.deleteOne({ _id: id });
-    const rows = await BlockList.find({ userID: projectID });
+    const rows = await BlockList.find({ phoneId: phoneId });
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);
@@ -59,8 +61,8 @@ const deleteBlockUser = async (req, res) => {
 };
 
 module.exports = {
-  getBlockUsers,
-  addBlockUser,
-  updateBlockUser,
-  deleteBlockUser,
+  get,
+  create,
+  update,
+  deleteOne,
 };

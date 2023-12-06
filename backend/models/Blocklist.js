@@ -2,9 +2,9 @@ const mongoose = require("mongoose");
 
 const blocklistSchema = new mongoose.Schema(
   {
+    phoneId: String,
     phone: String,
     name: String,
-    userID: String,
   },
   { timestamps: true }
 );

@@ -8,8 +8,10 @@ const { DocxLoader } = require("langchain/document_loaders/fs/docx");
 const { ChatOpenAI } = require("langchain/chat_models/openai");
 const { TextLoader } = require("langchain/document_loaders/fs/text");
 const { Document } = require("langchain/document");
+const Chatbot = require("../models/Chatbot");
+const BlockList = require("../models/Blocklist");
 const Dataset = require("../models/Dataset");
-const User = require("../models/User");
+const Phone = require("../models/Phone");
 const xlsx = require("xlsx");
 const Papa = require("papaparse");
 const fs = require("fs");
@@ -19,8 +21,6 @@ const { promisify } = require("util");
 const readFileAsync = promisify(fs.readFile);
 const unlinkAsync = promisify(fs.unlink);
 const { Client } = require("whatsapp-web.js");
-const Chatbot = require("../models/Chatbot");
-const BlockList = require("../models/Blocklist");
 require("dotenv").config();
 
 const sysPrompt = `You are an AI assistant providing helpful answers based on the context to provide conversational answer without any prior knowledge. You are given the following extracted parts of a long document and a question. If you can't find the answer in the context below, just say "Thank you for your question. I can not help you on this topic. Please look online using a search engine.". You can also ask the user to rephrase the question if you need more context. But don't try to make up an answer. If the question is not related to the context, politely respond that you are tuned to only answer questions that are related to the context. Answer in a concise or elaborate format as per the intent of the question. When asked a question, provide thorough and detailed answers as if the information is your own, and do not refer to your training as being from a document, like "The document mentions that ..." or "The document provides that ...".`;
@@ -37,7 +37,7 @@ const getDataset = async (req, res) => {
 };
 
 const getQRCode = async (req, res) => {
-  const { phone, projectName } = req.body;
+  const { phone, phoneTitle, userId } = req.body;
   try {
     res.writeHead(200, {
       "Content-Type": "text/event-stream",
@@ -52,7 +52,7 @@ const getQRCode = async (req, res) => {
       res.write(`data: ${JSON.stringify(responseData)}\n\n`);
     };
 
-    const row = await User.findOne({ phone: phone });
+    const row = await Phone.findOne({ phone: phone });
     if (row) {
       if (row.delflag == false) {
         sendData("[DoublePhone]");
@@ -72,12 +72,13 @@ const getQRCode = async (req, res) => {
     client.on("ready", async () => {
       console.log("Client is ready!");
       if (row) {
-        await User.updateOne({ phone: phone }, { $set: { delflag: false } });
+        await Phone.updateOne({ phone: phone }, { $set: { delflag: false } });
       } else {
-        await User.create({
-          title: projectName,
+        await Phone.create({
+          title: phoneTitle,
           phone: phone,
           botCount: 0,
+          userId: userId,
           delflag: false,
         });
       }
@@ -91,15 +92,17 @@ const getQRCode = async (req, res) => {
         const sender = senderTxt.split("@")[0];
         const isblocked = await BlockList.findOne({ phone: sender });
         if (isblocked == null) {
-          const userRow = await User.findOne({ phone: phone });
-          const userId = userRow._id.toString();
-          const botRow = await Chatbot.findOne({
-            userId: { $in: userId },
-            active: true,
-          });
-          if (botRow) {
-            const reply = await getReply(message.body, botRow._id);
-            message.reply(reply);
+          const userRow = await Phone.findOne({ phone: phone });
+          if (userRow) {
+            const userId = userRow._id.toString();
+            const botRow = await Chatbot.findOne({
+              userId: { $in: userId },
+              active: true,
+            });
+            if (botRow) {
+              const reply = await getReply(message.body, botRow._id);
+              message.reply(reply);
+            }
           }
         }
       }
@@ -108,7 +111,7 @@ const getQRCode = async (req, res) => {
     client.on("disconnected", async () => {
       console.log(`Client was disconnected`);
       client.destroy();
-      await User.updateOne({ phone: phone }, { $set: { delflag: true } });
+      await Phone.updateOne({ phone: phone }, { $set: { delflag: true } });
       // client.initialize();
     });
 
@@ -374,7 +377,6 @@ const trainbot = async (req, res) => {
     }
 
     const itemIds = idlist.map((item) => item);
-
     await Dataset.updateMany(
       { _id: { $in: itemIds } },
       { $set: { trainflag: true } }
