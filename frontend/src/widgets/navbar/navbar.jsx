@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import {
   Button,
   Typography,
@@ -18,7 +18,7 @@ export function Navbar() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [openMenu, setOpenMenu] = useState(false);
-  const user = useSelector((state) => state.auth.user);
+  const auth = useSelector((state) => state.auth);
 
   const menuItems = [
     {
@@ -32,13 +32,26 @@ export function Navbar() {
     },
   ];
 
+  useEffect(() => {
+    if (!auth.token) {
+      const href = window.location.href;
+      if (href.includes("/admin")) {
+        navigate("/admin/login");
+      } else {
+        navigate("/login");
+      }
+    }
+  }, []);
+
   const handleLogout = () => {
-    const userType = localStorage.getItem("userType");
     dispatch(logout());
-    if (userType == "admin") {
+    if (auth.user.userType == process.env.isAdmin) {
       navigate("/admin/login");
-    } else {
+      return;
+    }
+    if (auth.user.userType == process.env.isClient) {
       navigate("/login");
+      return;
     }
   };
 
@@ -90,7 +103,7 @@ export function Navbar() {
             About MintSuperChat
           </Typography>
         </div>
-        {user ? (
+        {auth.user ? (
           <Tooltip content="Log out" placement="bottom">
             <Button
               variant="text"
@@ -98,7 +111,7 @@ export function Navbar() {
               className="my-5 flex h-[40px] items-center justify-between rounded-full border-none px-5 py-0 font-normal normal-case shadow-none hover:shadow-none"
             >
               <Typography className="mx-1 text-base font-semibold text-[#174483]">
-                {user.username}
+                {auth.user.username}
               </Typography>
               <Avatar src="img/logout.svg" className="h-[20px] w-auto" />
             </Button>

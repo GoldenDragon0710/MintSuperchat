@@ -10,13 +10,14 @@ import { useNavigate } from "react-router-dom";
 export function AdminUsers() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const auth = useSelector((state) => state.auth.user);
   const bots = useSelector((state) => state.chatbot.bots);
   const users = useSelector((state) => state.user.users);
   const phones = useSelector((state) => state.phone.phones);
   const [userinfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "admin") {
+    if (auth && auth.userType != process.env.isAdmin) {
       navigate("/admin/login");
       return;
     }
@@ -57,8 +58,8 @@ export function AdminUsers() {
   }, [bots, users, phones]);
 
   const handleUser = (id, username) => {
-    localStorage.setItem("userId", id);
-    localStorage.setItem("username", username);
+    localStorage.setItem("curUserId", id);
+    localStorage.setItem("curUsername", username);
     navigate("/admin/phones");
   };
 

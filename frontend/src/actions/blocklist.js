@@ -9,6 +9,7 @@ export const getBlocklist = (data) => async (dispatch) => {
     dispatch({ type: GET_BLOCKLIST, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -19,6 +20,7 @@ export const addBlocklist = (data) => async (dispatch) => {
     dispatch({ type: GET_BLOCKLIST, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -29,5 +31,6 @@ export const deleteBlocklist = (data) => async (dispatch) => {
     dispatch({ type: GET_BLOCKLIST, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };

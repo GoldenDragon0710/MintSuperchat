@@ -17,16 +17,14 @@ import { getPhones, deletePhone } from "@/actions/phone";
 export function Home() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userId = localStorage.getItem("userId");
+  const auth = useSelector((state) => state.auth.user);
   const phones = useSelector((state) => state.phone.phones);
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "client") {
-      navigate("/login");
-      return;
+    if (auth && auth.userType == process.env.isClient) {
+      const data = { userId: auth._id };
+      dispatch(getPhones(data));
     }
-    const data = { userId: userId };
-    dispatch(getPhones(data));
   }, []);
 
   const handleDeletePhone = (id) => {

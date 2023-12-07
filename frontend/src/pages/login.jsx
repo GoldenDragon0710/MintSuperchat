@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import { useDispatch } from "react-redux";
 import { Button, Typography, Input } from "@material-tailwind/react";
 import { ClipLoader } from "react-spinners";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
@@ -9,7 +9,6 @@ import { login } from "@/actions/auth";
 export function Login() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const user = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -27,10 +26,11 @@ export function Login() {
       return;
     }
     setLoading(true);
-    dispatch(login(email, password))
+    const userType = process.env.isClient;
+    const data = { email, password, userType };
+    dispatch(login(data))
       .then(() => {
         setLoading(false);
-        localStorage.setItem("userId", user._id);
         navigate("/");
       })
       .catch(() => setLoading(false));

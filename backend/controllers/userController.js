@@ -1,12 +1,16 @@
+const { PineconeClient } = require("@pinecone-database/pinecone");
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const User = require("../models/User");
 const { validationResult } = require("express-validator");
+const Phone = require("../models/Phone");
+const Chatbot = require("../models/Chatbot");
+const Dataset = require("../models/Dataset");
+const BlockList = require("../models/Blocklist");
 require("dotenv").config();
 
 // @route    GET api/user
 // @desc     get all users
-// @access   Public
 const getAll = async (req, res) => {
   try {
     const rows = await User.find();
@@ -19,7 +23,6 @@ const getAll = async (req, res) => {
 
 // @route    GET api/user/count
 // @desc     get all users' count
-// @access   Public
 const getCount = async (req, res) => {
   try {
     const rows = await User.find();
@@ -32,7 +35,6 @@ const getCount = async (req, res) => {
 
 // @route    POST api/user
 // @desc     create user
-// @access   Public
 const create = async (req, res) => {
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
@@ -83,7 +85,6 @@ const create = async (req, res) => {
 
 // @route    POST api/user/update
 // @desc     Reset Password
-// @access   Public
 const update = async (req, res) => {
   try {
     const { id, password } = req.body;
@@ -104,14 +105,32 @@ const update = async (req, res) => {
 
 // @route    POST api/user/delete
 // @desc     delete user
-// @access   Public
 const deleteOne = async (req, res) => {
   try {
     const { id } = req.body;
     await User.deleteOne({ _id: id });
+    await Phone.deleteMany({ userId: id });
+    const bots = await Chatbot.find({ userId: id });
+    await Chatbot.deleteMany({ userId: id });
+    await Dataset.deleteMany({ userId: id });
+    await BlockList.deleteMany({ userId: id });
 
-    const rows = await User.find();
-    return res.status(200).json({ data: rows });
+    if (bots) {
+      const client = new PineconeClient();
+      await client.init({
+        apiKey: process.env.PINECONE_API_KEY,
+        environment: process.env.PINECONE_ENVIRONMENT,
+      });
+      const pineconeIndex = client.Index(process.env.PINECONE_INDEX);
+      bots.map(async (item) => {
+        await pineconeIndex.delete1({
+          namespace: item._id.toString(),
+          deleteAll: true,
+        });
+      });
+    }
+
+    return res.status(200).json({ message: "User deleted successfully" });
   } catch (err) {
     console.log(err);
     res.status(500).json({ message: "Internal server error" });

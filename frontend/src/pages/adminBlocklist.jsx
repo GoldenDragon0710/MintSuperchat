@@ -1,4 +1,6 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Card,
@@ -18,8 +20,6 @@ import { PlusIcon, XMarkIcon } from "@heroicons/react/24/solid";
 import PI from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 const ReactPhoneInput = PI.default ? PI.default : PI;
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import {
   getBlocklist,
   addBlocklist,
@@ -29,10 +29,12 @@ import {
 export function AdminBlocklist() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth.user);
+  const blocklist = useSelector((state) => state.blocklist.blocklist);
   const phoneId = localStorage.getItem("phoneId");
   const phoneTitle = localStorage.getItem("phoneTitle");
-  const username = localStorage.getItem("username");
-  const blocklist = useSelector((state) => state.blocklist.blocklist);
+  const curUserId = localStorage.getItem("curUserId");
+  const curUsername = localStorage.getItem("curUsername");
   const [loading, setLoading] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
@@ -42,11 +44,11 @@ export function AdminBlocklist() {
   const TABLE_HEAD = ["No", "Name", "Phone", "Actions"];
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "admin") {
+    if (auth && auth.userType != process.env.isAdmin) {
       navigate("/admin/login");
       return;
     }
-    if (username == null) {
+    if (auth && auth.username == null) {
       navigate("/admin/users");
       return;
     }
@@ -96,7 +98,12 @@ export function AdminBlocklist() {
       setPhoneRequired(true);
       return;
     }
-    const data = { name: newName, phone: newPhone, phoneId: phoneId };
+    const data = {
+      name: newName,
+      phone: newPhone,
+      phoneId: phoneId,
+      userId: curUserId,
+    };
     setLoading(true);
     dispatch(addBlocklist(data))
       .then(() => {
@@ -131,7 +138,7 @@ export function AdminBlocklist() {
             </a>
             <a href="/admin/phones">
               <Typography className="font-normal text-[#174483]">
-                {username}
+                {curUsername}
               </Typography>
             </a>
             <a href="/admin/chatbots">

@@ -4,6 +4,7 @@ import { Button, Typography, Input } from "@material-tailwind/react";
 import { ClipLoader } from "react-spinners";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
+import { notification } from "antd";
 import { login } from "@/actions/auth";
 
 export function AdminLogin() {
@@ -26,10 +27,13 @@ export function AdminLogin() {
       return;
     }
     setLoading(true);
-    dispatch(login(email, password))
+    const userType = process.env.isAdmin;
+    const data = { email, password, userType };
+    dispatch(login(data))
       .then(() => {
         setLoading(false);
         navigate("/admin");
+        notification.success({ message: "Welcome to Mint Superchat" });
       })
       .catch(() => setLoading(false));
   };

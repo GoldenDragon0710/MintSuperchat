@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
 import {
   Button,
   Typography,
@@ -18,7 +19,8 @@ import "react-phone-input-2/lib/style.css";
 const ReactPhoneInput = PI.default ? PI.default : PI;
 
 export function AdminConnect() {
-  const userId = localStorage.getItem("userId");
+  const auth = useSelector((state) => state.auth.user);
+  const curUserId = localStorage.getItem("curUserId");
   const [loading, setLoading] = useState(false);
   const [QRData, setQRData] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -35,11 +37,11 @@ export function AdminConnect() {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "admin") {
+    if (auth && auth.userType != process.env.isAdmin) {
       navigate("/admin/login");
       return;
     }
-    if (userId == null) {
+    if (auth && auth.id == null) {
       navigate("/admin/users");
       return;
     }
@@ -68,7 +70,7 @@ export function AdminConnect() {
             body: JSON.stringify({
               phone: phoneNumber,
               phoneTitle: isDisabled ? "default" : phoneTitle,
-              userId: userId,
+              userId: curUserId,
             }),
             signal: ctrl.signal,
             onmessage: (event) => {

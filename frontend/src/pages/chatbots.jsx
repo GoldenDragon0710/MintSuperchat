@@ -42,6 +42,7 @@ export function Chatbots() {
   const dispatch = useDispatch();
   const phoneId = localStorage.getItem("phoneId");
   const phoneTitle = localStorage.getItem("phoneTitle");
+  const auth = useSelector((state) => state.auth.user);
   const chatbots = useSelector((state) => state.chatbot.bots);
   const [loading, setLoading] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -50,7 +51,7 @@ export function Chatbots() {
   const TABLE_HEAD = ["No", "Details", "Actions"];
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "client") {
+    if (auth && auth.userType != process.env.isClient) {
       navigate("/login");
       return;
     }
@@ -94,7 +95,7 @@ export function Chatbots() {
       return;
     }
     setLoading(true);
-    const data = { phoneId: phoneId, title: newTitle };
+    const data = { userId: auth._id, phoneId: phoneId, title: newTitle };
     dispatch(addChatbot(data))
       .then(() => {
         setLoading(false);

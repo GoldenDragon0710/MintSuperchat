@@ -2,8 +2,11 @@ const { PineconeClient } = require("@pinecone-database/pinecone");
 const Chatbot = require("../models/Chatbot");
 const Phone = require("../models/Phone");
 const Dataset = require("../models/Dataset");
+const BlockList = require("../models/Blocklist");
 require("dotenv").config();
 
+// @route    POST api/phone
+// @desc     get all phones
 const get = async (req, res) => {
   try {
     const { userId } = req.body;
@@ -19,6 +22,8 @@ const get = async (req, res) => {
   }
 };
 
+// @route    GET api/phone/count
+// @desc     get all phones' count
 const getCount = async (req, res) => {
   try {
     const rows = await Phone.find();
@@ -47,19 +52,22 @@ const update = async (req, res) => {
   }
 };
 
+// @route    POST api/phone/delete
+// @desc     delete phone
 const deleteOne = async (req, res) => {
   try {
     const { id } = req.body;
     await Phone.deleteOne({ _id: id });
-    const botRows = await Chatbot.find({ userId: id });
+    const botRows = await Chatbot.find({ phoneId: id });
     const botIds = [];
     if (botRows) {
       botRows.map((item) => {
         botIds.push(item._id.toString());
       });
       if (botIds) {
-        await Chatbot.deleteMany({ userId: id });
+        await Chatbot.deleteMany({ phoneId: id });
         await Dataset.deleteMany({ botId: { $in: botIds } });
+        await BlockList.deleteMany({ phoneId: id });
 
         const client = new PineconeClient();
         await client.init({

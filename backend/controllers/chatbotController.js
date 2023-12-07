@@ -31,8 +31,13 @@ const getCount = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { phoneId, title } = req.body;
-    await Chatbot.create({ phoneId: phoneId, title: title, active: false });
+    const { userId, phoneId, title } = req.body;
+    await Chatbot.create({
+      userId: userId,
+      phoneId: phoneId,
+      title: title,
+      active: false,
+    });
     const botCountrow = await Phone.findById(phoneId);
     await Phone.updateOne(
       { _id: phoneId },

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
   Tabs,
@@ -29,24 +29,23 @@ import { useNavigate } from "react-router-dom";
 export function AdminDatasets() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const username = localStorage.getItem("username");
+  const auth = useSelector((state) => state.auth.user);
+  const dataset = useSelector((state) => state.dataset.datasets);
   const phoneTitle = localStorage.getItem("phoneTitle");
   const botId = localStorage.getItem("botId");
   const botTitle = localStorage.getItem("botTitle");
   const [loading, setLoading] = useState(false);
-  const [dataset, setDataset] = useState([]);
   const [fileDatasets, setFileDatasets] = useState([]);
   const [linkDatasets, setLinkDatasets] = useState([]);
   const [sitemapDatasets, setSitemapDatasets] = useState([]);
-  const [namelist, setNamelist] = useState([]);
   const [trainable, setTrainable] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "admin") {
+    if (auth && auth.userType != process.env.isAdmin) {
       navigate("/admin/login");
       return;
     }
-    if (username == null) {
+    if (auth && auth.username == null) {
       navigate("/admin/users");
       return;
     }
@@ -85,7 +84,6 @@ export function AdminDatasets() {
         }
         list.push(item.name);
       });
-      setNamelist(list);
       setFileDatasets(filelist);
       setLinkDatasets(linklist);
       setSitemapDatasets(sitemaplist);
@@ -133,7 +131,7 @@ export function AdminDatasets() {
             </a>
             <a href="/admin/phones">
               <Typography className="font-normal text-[#174483]">
-                {username}
+                {auth && auth.username}
               </Typography>
             </a>
             <a href="/admin/chatbots">
@@ -201,16 +199,13 @@ export function AdminDatasets() {
                   </TabsHeader>
                   <TabsBody className="px-5 pt-5">
                     <TabPanel key={"Upload"} value={"Upload"}>
-                      <FilesTab setDataset={setDataset} namelist={namelist} />
+                      <FilesTab />
                     </TabPanel>
                     <TabPanel key={"Link"} value={"Link"}>
-                      <LinksTab setDataset={setDataset} namelist={namelist} />
+                      <LinksTab />
                     </TabPanel>
                     <TabPanel key={"Sitemap"} value={"Sitemap"}>
-                      <SitemapsTab
-                        setDataset={setDataset}
-                        namelist={namelist}
-                      />
+                      <SitemapsTab />
                     </TabPanel>
                   </TabsBody>
                 </Tabs>

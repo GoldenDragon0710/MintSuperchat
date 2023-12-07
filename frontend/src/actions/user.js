@@ -9,6 +9,7 @@ export const register = (data) => async (dispatch) => {
     notification.success({ message: res.data.message });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -19,6 +20,7 @@ export const getUserCount = () => async (dispatch) => {
     dispatch({ type: GET_USERCOUNT, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -29,27 +31,29 @@ export const getUsers = () => async (dispatch) => {
     dispatch({ type: GET_USERS, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
 // Update user's password
-export const updatePwd = (password) => async (dispatch) => {
+export const updatePwd = (data) => async (dispatch) => {
   try {
-    const data = { password: password };
+    // const data = { password: password };
     const res = await api.post("/user/update", data);
     notification.success({ message: res.data.message });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
 // Delete user
-export const deleteUser = (id) => async (dispatch) => {
+export const deleteUser = (data) => async (dispatch) => {
   try {
-    const data = { id: id };
     const res = await api.post("/user/delete", data);
     notification.success({ message: res.data.message });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };

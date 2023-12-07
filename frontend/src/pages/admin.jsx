@@ -10,12 +10,13 @@ import { useNavigate } from "react-router-dom";
 export function Admin() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const auth = useSelector((state) => state.auth.user);
   const botCount = useSelector((state) => state.chatbot.botCount);
   const userCount = useSelector((state) => state.user.userCount);
   const phoneCount = useSelector((state) => state.phone.phoneCount);
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "admin") {
+    if (auth && auth.userType != process.env.isAdmin) {
       navigate("/admin/login");
       return;
     }

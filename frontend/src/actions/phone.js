@@ -9,6 +9,7 @@ export const getPhoneCount = () => async (dispatch) => {
     dispatch({ type: GET_PHONECOUNT, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -19,6 +20,7 @@ export const getPhones = (data) => async (dispatch) => {
     dispatch({ type: GET_PHONES, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -29,5 +31,6 @@ export const deletePhone = (data) => async (dispatch) => {
     notification.success({ message: res.data.message });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };

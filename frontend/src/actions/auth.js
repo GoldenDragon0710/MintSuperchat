@@ -6,34 +6,26 @@ import { USER_LOADED, LOGIN_SUCCESS, LOGOUT } from "./types";
 export const loadUser = () => async (dispatch) => {
   try {
     const res = await api.get("/auth");
-
     dispatch({
       type: USER_LOADED,
       payload: res.data,
     });
   } catch (err) {
-    console.log(err);
+    throw err;
   }
 };
 
 // Login User
-export const login = (email, password) => async (dispatch) => {
-  const body = { email, password };
+export const login = (data) => async (dispatch) => {
   try {
-    const res = await api.post("/auth", body);
+    const res = await api.post("/auth", data);
     dispatch({
       type: LOGIN_SUCCESS,
       payload: res.data,
     });
-    localStorage.setItem(
-      "userType",
-      res.data.user.userType ? "admin" : "client"
-    );
-
-    notification.success({ message: "Welcome to Mint Superchat" });
-    return res.status;
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 

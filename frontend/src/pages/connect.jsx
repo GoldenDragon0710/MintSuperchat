@@ -1,4 +1,6 @@
 import React, { useState, useEffect } from "react";
+import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Typography,
@@ -18,7 +20,8 @@ import "react-phone-input-2/lib/style.css";
 const ReactPhoneInput = PI.default ? PI.default : PI;
 
 export function Connect() {
-  const userId = localStorage.getItem("userId");
+  const navigate = useNavigate();
+  const auth = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
   const [QRData, setQRData] = useState("");
   const [isSuccess, setIsSuccess] = useState(false);
@@ -35,7 +38,7 @@ export function Connect() {
   };
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "client") {
+    if (auth && auth.userType != process.env.isClient) {
       navigate("/login");
       return;
     }
@@ -64,7 +67,7 @@ export function Connect() {
             body: JSON.stringify({
               phone: phoneNumber,
               phoneTitle: isDisabled ? "default" : phoneTitle,
-              userId: userId,
+              userId: auth.id,
             }),
             signal: ctrl.signal,
             onmessage: (event) => {

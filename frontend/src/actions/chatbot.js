@@ -9,6 +9,7 @@ export const getChatbotCount = () => async (dispatch) => {
     dispatch({ type: GET_BOTCOUNT, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -19,6 +20,7 @@ export const getChatbots = (data) => async (dispatch) => {
     dispatch({ type: GET_BOTS, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -29,6 +31,7 @@ export const addChatbot = (data) => async (dispatch) => {
     dispatch({ type: GET_BOTS, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -39,6 +42,7 @@ export const updateChatbot = (data) => async (dispatch) => {
     dispatch({ type: GET_BOTS, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -49,5 +53,6 @@ export const deleteChatbot = (data) => async (dispatch) => {
     dispatch({ type: GET_BOTS, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };

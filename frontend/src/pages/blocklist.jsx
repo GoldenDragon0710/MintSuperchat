@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
   Card,
@@ -19,7 +20,6 @@ import PI from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 const ReactPhoneInput = PI.default ? PI.default : PI;
 import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import {
   getBlocklist,
   addBlocklist,
@@ -29,9 +29,10 @@ import {
 export function Blocklist() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth.user);
+  const blocklist = useSelector((state) => state.blocklist.blocklist);
   const phoneId = localStorage.getItem("phoneId");
   const phoneTitle = localStorage.getItem("phoneTitle");
-  const blocklist = useSelector((state) => state.blocklist.blocklist);
   const [loading, setLoading] = useState(false);
   const [newName, setNewName] = useState("");
   const [newPhone, setNewPhone] = useState("");
@@ -41,7 +42,7 @@ export function Blocklist() {
   const TABLE_HEAD = ["No", "Name", "Phone", "Actions"];
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "client") {
+    if (auth && auth.userType != process.env.isClient) {
       navigate("/login");
       return;
     }

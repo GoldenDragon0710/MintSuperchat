@@ -21,7 +21,6 @@ import {
   HomeIcon,
   BookOpenIcon,
   TrashIcon,
-  UserIcon,
   ListBulletIcon,
 } from "@heroicons/react/24/outline";
 import {
@@ -41,9 +40,11 @@ import {
 export function AdminChatbots() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const username = localStorage.getItem("username");
+  const curUserId = localStorage.getItem("curUserId");
+  const curUsername = localStorage.getItem("curUsername");
   const phoneId = localStorage.getItem("phoneId");
   const phoneTitle = localStorage.getItem("phoneTitle");
+  const auth = useSelector((state) => state.auth.user);
   const chatbots = useSelector((state) => state.chatbot.bots);
   const [loading, setLoading] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -52,11 +53,11 @@ export function AdminChatbots() {
   const TABLE_HEAD = ["No", "Details", "Actions"];
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "admin") {
+    if (auth && auth.userType != process.env.isAdmin) {
       navigate("/admin/login");
       return;
     }
-    if (username == null) {
+    if (auth && auth.username == null) {
       navigate("/admin/users");
       return;
     }
@@ -100,7 +101,7 @@ export function AdminChatbots() {
       return;
     }
     setLoading(true);
-    const data = { phoneId: phoneId, title: newTitle };
+    const data = { userId: curUserId, phoneId: phoneId, title: newTitle };
     dispatch(addChatbot(data))
       .then(() => {
         setLoading(false);
@@ -160,7 +161,7 @@ export function AdminChatbots() {
             </a>
             <a href="/admin/phones">
               <Typography className="font-normal text-[#174483]">
-                {username}
+                {curUsername}
               </Typography>
             </a>
             <a href="/admin/chatbots">
@@ -236,7 +237,7 @@ export function AdminChatbots() {
                           : "p-4 border-b border-blue-gray-50";
 
                         return (
-                          <tr key={item.title}>
+                          <tr key={index}>
                             <td className={classes}>
                               <div className="flex gap-3">
                                 <div className="mx-2 flex cursor-pointer items-center">

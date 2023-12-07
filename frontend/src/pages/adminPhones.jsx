@@ -14,25 +14,26 @@ import { HomeIcon } from "@heroicons/react/24/outline";
 import { useNavigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
 import { getPhones, deletePhone } from "@/actions/phone";
-import { updatePwd, deleteUser } from "@/actions/user";
+import { deleteUser } from "@/actions/user";
 
 export function AdminPhones() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const userId = localStorage.getItem("userId");
-  const username = localStorage.getItem("username");
+  const curUserId = localStorage.getItem("curUserId");
+  const curUsername = localStorage.getItem("curUsername");
+  const auth = useSelector((state) => state.auth.user);
   const phones = useSelector((state) => state.phone.phones);
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "admin") {
+    if (auth && auth.userType != process.env.isAdmin) {
       navigate("/admin/login");
       return;
     }
-    if (username == null) {
+    if (auth && auth.username == null) {
       navigate("/admin/users");
       return;
     }
-    const data = { userId: userId };
+    const data = { userId: curUserId };
     dispatch(getPhones(data));
   }, []);
 
@@ -47,12 +48,12 @@ export function AdminPhones() {
     localStorage.setItem("phoneTitle", title);
   };
 
-  const handleResetPwd = () => {
-    let userId = localStorage.getItem("userId");
-  };
+  const handleResetPwd = () => {};
 
   const handleUserDelete = () => {
-    dispatch(deleteUser(userId));
+    const data = { id: curUserId };
+    dispatch(deleteUser(data));
+    navigate("/admin/users");
   };
 
   return (
@@ -70,7 +71,7 @@ export function AdminPhones() {
             </a>
             <a href="/admin/phones">
               <Typography className="font-normal text-[#174483]">
-                {username}
+                {curUsername}
               </Typography>
             </a>
           </Breadcrumbs>

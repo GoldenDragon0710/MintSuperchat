@@ -2,6 +2,8 @@ const mongoose = require("mongoose");
 
 const datasetSchema = new mongoose.Schema(
   {
+    userId: String,
+    phoneId: String,
     botId: String,
     title: String,
     datasetType: String,

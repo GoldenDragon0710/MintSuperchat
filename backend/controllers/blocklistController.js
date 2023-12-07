@@ -13,11 +13,12 @@ const get = async (req, res) => {
 
 const create = async (req, res) => {
   try {
-    const { phone, name, phoneId } = req.body;
+    const { phone, name, phoneId, userId } = req.body;
     await BlockList.create({
       name: name,
       phone: phone,
       phoneId: phoneId,
+      userId: userId,
     });
     const rows = await BlockList.find({ phoneId: phoneId });
     return res.status(200).json({ data: rows });

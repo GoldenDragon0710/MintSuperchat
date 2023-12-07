@@ -9,6 +9,7 @@ export const getDatasets = (data) => async (dispatch) => {
     dispatch({ type: GET_DATASETS, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -19,6 +20,7 @@ export const deleteDatasets = (data) => async (dispatch) => {
     dispatch({ type: GET_DATASETS, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -33,6 +35,7 @@ export const trainDatasets = (data) => async (dispatch) => {
     dispatch({ type: GET_DATASETS, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };
 
@@ -43,5 +46,6 @@ export const getsitemapXML = (data) => async (dispatch) => {
     dispatch({ type: GET_XMLLINKS, payload: res.data.data });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
+    throw err;
   }
 };

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { useDispatch } from "react-redux";
+import { useDispatch, useSelector } from "react-redux";
 import {
   Input,
   Typography,
@@ -9,13 +9,12 @@ import {
 } from "@material-tailwind/react";
 import { EyeIcon, EyeSlashIcon } from "@heroicons/react/24/outline";
 import { HomeIcon } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router-dom";
 import { register } from "@/actions/user";
 import { ClipLoader } from "react-spinners";
 
 export function AdminRegister() {
-  const navigate = useNavigate();
   const dispatch = useDispatch();
+  const auth = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
@@ -27,7 +26,7 @@ export function AdminRegister() {
   const [isAdmin, setIsAdmin] = useState(false);
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "admin") {
+    if (auth && auth.userType != process.env.isAdmin) {
       navigate("/admin/login");
       return;
     }
@@ -93,7 +92,7 @@ export function AdminRegister() {
             <a href="/admin">
               <HomeIcon className="h-5 w-5 text-[#174483]" />
             </a>
-            <a href="/register">
+            <a href="/admin/register">
               <Typography className="font-normal text-[#174483]">
                 Create user
               </Typography>

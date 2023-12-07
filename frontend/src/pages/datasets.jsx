@@ -29,35 +29,33 @@ import { useNavigate } from "react-router-dom";
 export function Datasets() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const auth = useSelector((state) => state.auth.user);
+  const dataset = useSelector((state) => state.dataset.datasets);
   const phoneTitle = localStorage.getItem("phoneTitle");
   const botId = localStorage.getItem("botId");
   const botTitle = localStorage.getItem("botTitle");
   const [loading, setLoading] = useState(false);
-  const [dataset, setDataset] = useState([]);
   const [fileDatasets, setFileDatasets] = useState([]);
   const [linkDatasets, setLinkDatasets] = useState([]);
   const [sitemapDatasets, setSitemapDatasets] = useState([]);
-  const [namelist, setNamelist] = useState([]);
   const [trainable, setTrainable] = useState(true);
 
   useEffect(() => {
-    if (localStorage.getItem("userType") != "client") {
-      navigate("/login");
-      return;
+    if (auth && auth.userType == process.env.isClient) {
+      if (phoneTitle == null) {
+        navigate("/");
+        return;
+      }
+      if (botId == null) {
+        navigate("/chatbots");
+        return;
+      }
+      const data = { botId: botId };
+      setLoading(true);
+      dispatch(getDatasets(data))
+        .then(() => setLoading(false))
+        .catch(() => setLoading(false));
     }
-    if (phoneTitle == null) {
-      navigate("/");
-      return;
-    }
-    if (botId == null) {
-      navigate("/chatbots");
-      return;
-    }
-    const data = { botId: botId };
-    setLoading(true);
-    dispatch(getDatasets(data))
-      .then(() => setLoading(false))
-      .catch(() => setLoading(false));
   }, []);
 
   useEffect(() => {
@@ -80,7 +78,6 @@ export function Datasets() {
         }
         list.push(item.name);
       });
-      setNamelist(list);
       setFileDatasets(filelist);
       setLinkDatasets(linklist);
       setSitemapDatasets(sitemaplist);
@@ -191,16 +188,13 @@ export function Datasets() {
                   </TabsHeader>
                   <TabsBody className="px-5 pt-5">
                     <TabPanel key={"Upload"} value={"Upload"}>
-                      <FilesTab setDataset={setDataset} namelist={namelist} />
+                      <FilesTab />
                     </TabPanel>
                     <TabPanel key={"Link"} value={"Link"}>
-                      <LinksTab setDataset={setDataset} namelist={namelist} />
+                      <LinksTab />
                     </TabPanel>
                     <TabPanel key={"Sitemap"} value={"Sitemap"}>
-                      <SitemapsTab
-                        setDataset={setDataset}
-                        namelist={namelist}
-                      />
+                      <SitemapsTab />
                     </TabPanel>
                   </TabsBody>
                 </Tabs>

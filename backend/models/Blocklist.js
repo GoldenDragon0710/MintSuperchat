@@ -2,6 +2,7 @@ const mongoose = require("mongoose");
 
 const blocklistSchema = new mongoose.Schema(
   {
+    userId: String,
     phoneId: String,
     phone: String,
     name: String,
