@@ -4,7 +4,7 @@ import { LOGOUT } from "../actions/types";
 
 // Create an instance of axios
 const api = axios.create({
-  baseURL: process.env.REACT_APP_BASED_URL,
+  baseURL: `${process.env.REACT_APP_BASED_URL}/api`,
   timeout: 200000,
   headers: {
     "Content-Type": "application/json",

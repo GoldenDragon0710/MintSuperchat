@@ -27,7 +27,7 @@ export function AdminRegister() {
 
   useEffect(() => {
     if (auth && auth.userType != process.env.isAdmin) {
-      navigate("/admin/login");
+      // navigate("/admin/login");
       return;
     }
   }, []);

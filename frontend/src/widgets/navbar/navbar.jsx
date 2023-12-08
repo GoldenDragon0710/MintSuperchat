@@ -32,16 +32,16 @@ export function Navbar() {
     },
   ];
 
-  useEffect(() => {
-    if (!auth.token) {
-      const href = window.location.href;
-      if (href.includes("/admin")) {
-        navigate("/admin/login");
-      } else {
-        navigate("/login");
-      }
-    }
-  }, []);
+  // useEffect(() => {
+  //   if (!auth.token) {
+  //     const href = window.location.href;
+  //     if (href.includes("/admin")) {
+  //       navigate("/admin/login");
+  //     } else {
+  //       navigate("/login");
+  //     }
+  //   }
+  // }, []);
 
   const handleLogout = () => {
     dispatch(logout());
@@ -59,7 +59,10 @@ export function Navbar() {
     <>
       <div className="container relative mx-auto flex items-center justify-between">
         <a href="/">
-          <Avatar src="img/logo.svg" className="h-auto w-[180px]" />
+          <Avatar
+            src={`${process.env.REACT_APP_BASED_URL}/imgs/logo.svg`}
+            className="h-auto w-[180px]"
+          />
         </a>
         <div className="flex items-center justify-between">
           <a href="/">
@@ -113,7 +116,10 @@ export function Navbar() {
               <Typography className="mx-1 text-base font-semibold text-[#174483]">
                 {auth.user.username}
               </Typography>
-              <Avatar src="img/logout.svg" className="h-[20px] w-auto" />
+              <Avatar
+                src={`${process.env.REACT_APP_BASED_URL}/imgs/logout.svg`}
+                className="h-[20px] w-auto"
+              />
             </Button>
           </Tooltip>
         ) : (
@@ -122,7 +128,10 @@ export function Navbar() {
               variant="outlined"
               className="my-5 flex h-[40px] w-[100px] items-center justify-between rounded-full border-none bg-[#144DD21A] px-5 py-0 font-normal normal-case shadow-none hover:shadow-none"
             >
-              <Avatar src="img/user.svg" className="h-[15px] w-[14px]" />
+              <Avatar
+                src={`${process.env.REACT_APP_BASED_URL}/imgs/user.svg`}
+                className="h-[15px] w-[14px]"
+              />
               <Typography className="text-sm font-semibold text-[#174483]">
                 Log in
               </Typography>

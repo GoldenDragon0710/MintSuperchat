@@ -1,5 +1,6 @@
 const express = require("express");
 const cors = require("cors");
+const path = require("path");
 const mongoose = require("mongoose");
 const phoneController = require("./controllers/phoneController");
 const bodyParser = require("body-parser");
@@ -11,6 +12,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 process.setMaxListeners(0);
+
+app.use(express.static(path.join(__dirname, "resources")));
 
 // Set up bodyParser middleware
 app.use(bodyParser.urlencoded({ limit: "100MB", extended: true }));

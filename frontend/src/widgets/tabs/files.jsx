@@ -84,7 +84,10 @@ export function FilesTab() {
           className="flex h-48 w-full cursor-pointer flex-col items-center justify-center rounded-lg bg-gradient-to-t from-[#0000000C] from-0% to-[#EFF0F1] to-100%"
         >
           <div className="flex flex-col items-center justify-center pb-6 pt-5">
-            <Avatar src="img/upload.svg" className="m-2 h-auto w-[5.5rem]" />
+            <Avatar
+              src={`${process.env.REACT_APP_BASED_URL}/imgs/upload.svg`}
+              className="m-2 h-auto w-[5.5rem]"
+            />
             <p className="text-md font-normal text-[#00000080]">
               Click to upload your files or drag and drop them here
             </p>

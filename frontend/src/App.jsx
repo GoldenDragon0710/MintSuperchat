@@ -32,7 +32,9 @@ function App() {
       <div className="absolute z-10 w-full border-b-2 border-[#1744831A] bg-white">
         <Navbar />
       </div>
-      <div className="bg-[url('../img/background.svg')] bg-cover bg-center">
+      <div
+        className={`bg-[url('${process.env.REACT_APP_BASED_URL}/imgs/background.svg')] bg-cover bg-center`}
+      >
         <Routes>
           {routes.map(
             ({ path, element }, key) =>

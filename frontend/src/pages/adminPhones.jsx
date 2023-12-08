@@ -161,7 +161,7 @@ export function AdminPhones() {
                 className="flex w-fit items-center rounded-full px-4 py-2 text-sm font-medium normal-case text-[#174483]"
               >
                 <Avatar
-                  src="img/key.svg"
+                  src={`${process.env.REACT_APP_BASED_URL}/imgs/key.svg`}
                   className="mr-1 h-4 w-4 rounded-none p-0"
                 />
                 Reset Password

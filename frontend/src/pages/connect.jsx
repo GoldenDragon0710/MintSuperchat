@@ -58,7 +58,7 @@ export function Connect() {
       setLoading(true);
       try {
         await fetchEventSource(
-          `${process.env.REACT_APP_BASED_URL}/dataset/getQRCode`,
+          `${process.env.REACT_APP_BASED_URL}/api/dataset/getQRCode`,
           {
             method: "POST",
             headers: {
@@ -175,7 +175,7 @@ export function Connect() {
                   ) : (
                     <Typography className="text-lg font-normal">
                       <Avatar
-                        src="img/whatsapp_icon.svg"
+                        src={`${process.env.REACT_APP_BASED_URL}/imgs/whatsapp_icon.svg`}
                         className="mr-1 h-auto w-[20px] rounded-none"
                       />
                       Connect WhatsApp
