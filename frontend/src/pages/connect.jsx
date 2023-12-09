@@ -60,7 +60,7 @@ export function Connect() {
             body: JSON.stringify({
               phone: phoneNumber,
               phoneTitle: isDisabled ? "default" : phoneTitle,
-              userId: auth.id,
+              userId: auth._id,
             }),
             signal: ctrl.signal,
             onmessage: (event) => {

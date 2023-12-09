@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   Button,
@@ -31,6 +31,22 @@ https://minbo.health/about
 ...
   `;
 
+  useEffect(() => {
+    if (xmlLinks) {
+      let linkString = multiLinksText;
+      if (linkString != "") {
+        linkString += "\n";
+      }
+      xmlLinks.map((item, idx) => {
+        linkString += item;
+        if (idx != xmlLinks.length - 1) {
+          linkString += "\n";
+        }
+      });
+      setMultiLinksText(linkString);
+    }
+  }, [xmlLinks]);
+
   const handleGetSitemapXML = () => {
     if (isSitemapLink(sitemapXML) == false) {
       s;
@@ -46,17 +62,7 @@ https://minbo.health/about
     dispatch(getsitemapXML(data))
       .then(() => {
         setSitemapXML("");
-        let linkString = multiLinksText;
-        if (linkString != "") {
-          linkString += "\n";
-        }
-        xmlLinks.map((item, idx) => {
-          linkString += item;
-          if (idx != xmlLinks.length - 1) {
-            linkString += "\n";
-          }
-        });
-        setMultiLinksText(linkString);
+
         setSitemapXMLLoading(false);
       })
       .catch(() => {
