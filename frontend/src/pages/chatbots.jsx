@@ -51,10 +51,6 @@ export function Chatbots() {
   const TABLE_HEAD = ["No", "Details", "Actions"];
 
   useEffect(() => {
-    if (auth && auth.userType != process.env.isClient) {
-      navigate("/login");
-      return;
-    }
     if (phoneId == null) {
       navigate("/");
       return;

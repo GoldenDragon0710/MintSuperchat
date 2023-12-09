@@ -25,13 +25,6 @@ export function AdminRegister() {
   const [passwordRequired, setPasswordRequired] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  useEffect(() => {
-    if (auth && auth.userType != process.env.isAdmin) {
-      // navigate("/admin/login");
-      return;
-    }
-  }, []);
-
   const handleSubmit = () => {
     if (username == "") {
       setUsernameRequired(true);

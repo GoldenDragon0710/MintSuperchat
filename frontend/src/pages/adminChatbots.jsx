@@ -53,11 +53,7 @@ export function AdminChatbots() {
   const TABLE_HEAD = ["No", "Details", "Actions"];
 
   useEffect(() => {
-    if (auth && auth.userType != process.env.isAdmin) {
-      navigate("/admin/login");
-      return;
-    }
-    if (auth && auth.username == null) {
+    if (auth.username == null) {
       navigate("/admin/users");
       return;
     }

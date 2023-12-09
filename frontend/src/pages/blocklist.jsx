@@ -42,10 +42,6 @@ export function Blocklist() {
   const TABLE_HEAD = ["No", "Name", "Phone", "Actions"];
 
   useEffect(() => {
-    if (auth && auth.userType != process.env.isClient) {
-      navigate("/login");
-      return;
-    }
     if (phoneId == null) {
       navigate("/");
       return;

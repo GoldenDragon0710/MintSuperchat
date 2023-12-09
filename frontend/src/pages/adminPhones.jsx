@@ -25,11 +25,7 @@ export function AdminPhones() {
   const phones = useSelector((state) => state.phone.phones);
 
   useEffect(() => {
-    if (auth && auth.userType != process.env.isAdmin) {
-      navigate("/admin/login");
-      return;
-    }
-    if (auth && auth.username == null) {
+    if (auth.username == null) {
       navigate("/admin/users");
       return;
     }

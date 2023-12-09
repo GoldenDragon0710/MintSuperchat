@@ -21,10 +21,8 @@ export function Home() {
   const phones = useSelector((state) => state.phone.phones);
 
   useEffect(() => {
-    if (auth && auth.userType == process.env.isClient) {
-      const data = { userId: auth._id };
-      dispatch(getPhones(data));
-    }
+    const data = { userId: auth._id };
+    dispatch(getPhones(data));
   }, []);
 
   const handleDeletePhone = (id) => {

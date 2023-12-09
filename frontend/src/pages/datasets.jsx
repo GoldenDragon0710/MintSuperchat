@@ -41,21 +41,19 @@ export function Datasets() {
   const [trainable, setTrainable] = useState(true);
 
   useEffect(() => {
-    if (auth && auth.userType == process.env.isClient) {
-      if (phoneTitle == null) {
-        navigate("/");
-        return;
-      }
-      if (botId == null) {
-        navigate("/chatbots");
-        return;
-      }
-      const data = { botId: botId };
-      setLoading(true);
-      dispatch(getDatasets(data))
-        .then(() => setLoading(false))
-        .catch(() => setLoading(false));
+    if (phoneTitle == null) {
+      navigate("/");
+      return;
     }
+    if (botId == null) {
+      navigate("/chatbots");
+      return;
+    }
+    const data = { botId: botId };
+    setLoading(true);
+    dispatch(getDatasets(data))
+      .then(() => setLoading(false))
+      .catch(() => setLoading(false));
   }, []);
 
   useEffect(() => {

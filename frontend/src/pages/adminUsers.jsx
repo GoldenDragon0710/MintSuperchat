@@ -17,10 +17,6 @@ export function AdminUsers() {
   const [userinfo, setUserInfo] = useState(null);
 
   useEffect(() => {
-    if (auth && auth.userType != process.env.isAdmin) {
-      navigate("/admin/login");
-      return;
-    }
     dispatch(getUsers());
     dispatch(getChatbots({}));
     dispatch(getPhones({}));

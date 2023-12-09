@@ -37,13 +37,6 @@ export function Connect() {
     },
   };
 
-  useEffect(() => {
-    if (auth && auth.userType != process.env.isClient) {
-      navigate("/login");
-      return;
-    }
-  }, []);
-
   const handleConnect = () => {
     if (phoneTitle == "" && !isDisabled) {
       notification.warning({ message: "Please enter a project name" });

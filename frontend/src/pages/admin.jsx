@@ -16,10 +16,6 @@ export function Admin() {
   const phoneCount = useSelector((state) => state.phone.phoneCount);
 
   useEffect(() => {
-    if (auth && auth.userType != process.env.isAdmin) {
-      navigate("/admin/login");
-      return;
-    }
     dispatch(getChatbotCount());
     dispatch(getUserCount());
     dispatch(getPhoneCount());

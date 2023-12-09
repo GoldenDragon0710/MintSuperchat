@@ -13,3 +13,6 @@ export * from "@/pages/adminPhones";
 export * from "@/pages/adminUsers";
 export * from "@/pages/adminBlocklist";
 export * from "@/pages/adminDatasets";
+
+export * from "@/pages/Layout";
+export * from "@/pages/adminLayout";

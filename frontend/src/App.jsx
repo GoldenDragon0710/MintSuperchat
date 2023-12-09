@@ -1,5 +1,5 @@
 import React, { useEffect } from "react";
-import { Routes, Route, Navigate } from "react-router-dom";
+import { useRoutes } from "react-router-dom";
 import routes from "@/routes";
 import { Navbar } from "./widgets/navbar";
 import { LOGOUT } from "./actions/types";
@@ -11,6 +11,7 @@ import { loadUser } from "./actions/auth";
 import setAuthToken from "./utils/setAuthToken";
 
 function App() {
+  const pages = useRoutes(routes);
   useEffect(() => {
     // check for token in LS when app first runs
     if (localStorage.token) {
@@ -32,17 +33,7 @@ function App() {
       <div className="absolute z-10 w-full border-b-2 border-[#1744831A] bg-white">
         <Navbar />
       </div>
-      <div
-        className={`bg-[url('${process.env.REACT_APP_BASED_URL}/imgs/background.svg')] bg-cover bg-center`}
-      >
-        <Routes>
-          {routes.map(
-            ({ path, element }, key) =>
-              element && <Route key={key} exact path={path} element={element} />
-          )}
-          <Route path="*" element={<Navigate to="/login" replace />} />
-        </Routes>
-      </div>
+      <div className={`bg-custom-background bg-cover bg-center`}>{pages}</div>
     </Provider>
   );
 }

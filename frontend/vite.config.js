@@ -8,7 +8,7 @@ export default defineConfig({
   },
   define: {
     "process.env": {
-      REACT_APP_BASED_URL: "http://64.227.17.37",
+      REACT_APP_BASED_URL: "http://64.227.17.37:3000",
       // REACT_APP_BASED_URL: "http://localhost:3000",
       isAdmin: true,
       isClient: false,

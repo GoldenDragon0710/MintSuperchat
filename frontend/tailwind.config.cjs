@@ -4,7 +4,12 @@ const withMT = require("@material-tailwind/react/utils/withMT");
 module.exports = withMT({
   content: ["./index.html", "./src/**/*.{js,ts,jsx,tsx}"],
   theme: {
-    extend: {},
+    extend: {
+      backgroundImage: (theme) => ({
+        "custom-background":
+          "url('http://64.227.17.37:3000/imgs/background.svg')",
+      }),
+    },
   },
   plugins: [],
 });

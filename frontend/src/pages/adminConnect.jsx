@@ -37,11 +37,7 @@ export function AdminConnect() {
   };
 
   useEffect(() => {
-    if (auth && auth.userType != process.env.isAdmin) {
-      navigate("/admin/login");
-      return;
-    }
-    if (auth && auth.id == null) {
+    if (auth.id == null) {
       navigate("/admin/users");
       return;
     }
