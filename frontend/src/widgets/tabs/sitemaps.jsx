@@ -26,8 +26,8 @@ export function SitemapsTab() {
   const [fileList, setFilelist] = useState([]);
   const [fileNameList, setFileNameList] = useState([]);
   const [multiLinksText, setMultiLinksText] = useState("");
-  const placeholder = `https://minbo.health
-https://minbo.health/about
+  const placeholder = `https://www.example.com
+https://www.example.com/about
 ...
   `;
 

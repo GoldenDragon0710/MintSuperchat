@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Button,
   Typography,
@@ -19,6 +20,7 @@ import "react-phone-input-2/lib/style.css";
 const ReactPhoneInput = PI.default ? PI.default : PI;
 
 export function AdminConnect() {
+  const navigate = useNavigate();
   const auth = useSelector((state) => state.auth.user);
   const curUserId = localStorage.getItem("curUserId");
   const [loading, setLoading] = useState(false);

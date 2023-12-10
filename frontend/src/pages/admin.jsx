@@ -5,12 +5,9 @@ import { HomeIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getUserCount } from "@/actions/user";
 import { getChatbotCount } from "@/actions/chatbot";
 import { getPhoneCount } from "@/actions/phone";
-import { useNavigate } from "react-router-dom";
 
 export function Admin() {
   const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const auth = useSelector((state) => state.auth.user);
   const botCount = useSelector((state) => state.chatbot.botCount);
   const userCount = useSelector((state) => state.user.userCount);
   const phoneCount = useSelector((state) => state.phone.phoneCount);

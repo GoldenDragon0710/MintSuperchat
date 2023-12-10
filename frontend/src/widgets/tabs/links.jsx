@@ -12,8 +12,8 @@ export function LinksTab() {
   const datasets = useSelector((state) => state.dataset.datasets);
   const [loading, setLoading] = useState(false);
   const [multiLinksText, setMultiLinksText] = useState("");
-  const placeholder = `https://minbo.health
-https://minbo.health/about
+  const placeholder = `https://www.example.com
+https://www.example.com/about
 ...
   `;
 
