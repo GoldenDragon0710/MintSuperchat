@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from "react";
-import { useDispatch, useSelector } from "react-redux";
+import React, { useState } from "react";
+import { useDispatch } from "react-redux";
 import {
   Input,
   Typography,
@@ -14,7 +14,6 @@ import { ClipLoader } from "react-spinners";
 
 export function AdminRegister() {
   const dispatch = useDispatch();
-  const auth = useSelector((state) => state.auth.user);
   const [loading, setLoading] = useState(false);
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");

@@ -29,7 +29,6 @@ import {
 export function Blocklist() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const auth = useSelector((state) => state.auth.user);
   const blocklist = useSelector((state) => state.blocklist.blocklist);
   const phoneId = localStorage.getItem("phoneId");
   const phoneTitle = localStorage.getItem("phoneTitle");

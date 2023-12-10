@@ -10,7 +10,6 @@ import { useNavigate } from "react-router-dom";
 export function AdminUsers() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const auth = useSelector((state) => state.auth.user);
   const bots = useSelector((state) => state.chatbot.bots);
   const users = useSelector((state) => state.user.users);
   const phones = useSelector((state) => state.phone.phones);

@@ -29,7 +29,6 @@ import { useNavigate } from "react-router-dom";
 export function Datasets() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const auth = useSelector((state) => state.auth.user);
   const dataset = useSelector((state) => state.dataset.datasets);
   const phoneTitle = localStorage.getItem("phoneTitle");
   const botId = localStorage.getItem("botId");

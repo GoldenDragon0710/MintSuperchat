@@ -31,6 +31,7 @@ export function AdminDatasets() {
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth.user);
   const dataset = useSelector((state) => state.dataset.datasets);
+  const curUserId = localStorage.getItem("curUserId");
   const phoneTitle = localStorage.getItem("phoneTitle");
   const botId = localStorage.getItem("botId");
   const botTitle = localStorage.getItem("botTitle");
@@ -41,7 +42,7 @@ export function AdminDatasets() {
   const [trainable, setTrainable] = useState(true);
 
   useEffect(() => {
-    if (auth.username == null) {
+    if (curUserId == null) {
       navigate("/admin/users");
       return;
     }

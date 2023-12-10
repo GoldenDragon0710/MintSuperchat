@@ -44,7 +44,6 @@ export function AdminChatbots() {
   const curUsername = localStorage.getItem("curUsername");
   const phoneId = localStorage.getItem("phoneId");
   const phoneTitle = localStorage.getItem("phoneTitle");
-  const auth = useSelector((state) => state.auth.user);
   const chatbots = useSelector((state) => state.chatbot.bots);
   const [loading, setLoading] = useState(false);
   const [newTitle, setNewTitle] = useState("");
@@ -53,7 +52,7 @@ export function AdminChatbots() {
   const TABLE_HEAD = ["No", "Details", "Actions"];
 
   useEffect(() => {
-    if (auth.username == null) {
+    if (curUserId == null) {
       navigate("/admin/users");
       return;
     }

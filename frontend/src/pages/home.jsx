@@ -1,4 +1,6 @@
 import React, { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
+import { useNavigate } from "react-router-dom";
 import {
   Card,
   CardBody,
@@ -10,8 +12,6 @@ import {
 } from "@material-tailwind/react";
 import { TrashIcon } from "@heroicons/react/24/outline";
 import { HomeIcon } from "@heroicons/react/24/outline";
-import { useNavigate } from "react-router-dom";
-import { useDispatch, useSelector } from "react-redux";
 import { getPhones, deletePhone } from "@/actions/phone";
 
 export function Home() {

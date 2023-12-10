@@ -21,11 +21,10 @@ export function AdminPhones() {
   const dispatch = useDispatch();
   const curUserId = localStorage.getItem("curUserId");
   const curUsername = localStorage.getItem("curUsername");
-  const auth = useSelector((state) => state.auth.user);
   const phones = useSelector((state) => state.phone.phones);
 
   useEffect(() => {
-    if (auth.username == null) {
+    if (curUserId == null) {
       navigate("/admin/users");
       return;
     }

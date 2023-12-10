@@ -29,7 +29,6 @@ import {
 export function AdminBlocklist() {
   const navigate = useNavigate();
   const dispatch = useDispatch();
-  const auth = useSelector((state) => state.auth.user);
   const blocklist = useSelector((state) => state.blocklist.blocklist);
   const phoneId = localStorage.getItem("phoneId");
   const phoneTitle = localStorage.getItem("phoneTitle");
@@ -44,7 +43,7 @@ export function AdminBlocklist() {
   const TABLE_HEAD = ["No", "Name", "Phone", "Actions"];
 
   useEffect(() => {
-    if (auth.username == null) {
+    if (curUserId == null) {
       navigate("/admin/users");
       return;
     }
