@@ -252,7 +252,7 @@ https://www.example.com/about
           onClick={generateCSVfile}
         >
           <Avatar
-            src={`${process.env.REACT_APP_BASED_URL}/imgs/download.svg`}
+            src={`${process.env.REACT_APP_BASED_URL}/images/download.svg`}
             className="m-2 h-auto w-[20px] rounded-none"
           />
           <Typography className="text-[16px] font-semibold text-[#174483]">
@@ -323,7 +323,7 @@ https://www.example.com/about
         >
           <div className="flex flex-col items-center justify-center pb-6 pt-5">
             <Avatar
-              src={`${process.env.REACT_APP_BASED_URL}/imgs/upload.svg`}
+              src={`${process.env.REACT_APP_BASED_URL}/images/upload.svg`}
               className="m-2 h-auto w-[5.5rem]"
             />
             <p className="text-md font-normal text-[#00000080]">

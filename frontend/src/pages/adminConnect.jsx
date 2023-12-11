@@ -174,7 +174,7 @@ export function AdminConnect() {
                   ) : (
                     <Typography className="text-lg font-normal">
                       <Avatar
-                        src={`${process.env.REACT_APP_BASED_URL}/imgs/whatsapp_icon.svg`}
+                        src={`${process.env.REACT_APP_BASED_URL}/images/whatsapp_icon.svg`}
                         className="mr-1 h-auto w-[20px] rounded-none"
                       />
                       Connect WhatsApp

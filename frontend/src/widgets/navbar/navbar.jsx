@@ -60,7 +60,7 @@ export function Navbar() {
       <div className="container relative mx-auto flex items-center justify-between">
         <a href="/">
           <Avatar
-            src={`${process.env.REACT_APP_BASED_URL}/imgs/logo.svg`}
+            src={`${process.env.REACT_APP_BASED_URL}/images/logo.svg`}
             className="h-auto w-[180px]"
           />
         </a>
@@ -117,7 +117,7 @@ export function Navbar() {
                 {auth.user.username}
               </Typography>
               <Avatar
-                src={`${process.env.REACT_APP_BASED_URL}/imgs/logout.svg`}
+                src={`${process.env.REACT_APP_BASED_URL}/images/logout.svg`}
                 className="h-[20px] w-auto"
               />
             </Button>
@@ -129,7 +129,7 @@ export function Navbar() {
               className="my-5 flex h-[40px] w-[100px] items-center justify-between rounded-full border-none bg-[#144DD21A] px-5 py-0 font-normal normal-case shadow-none hover:shadow-none"
             >
               <Avatar
-                src={`${process.env.REACT_APP_BASED_URL}/imgs/user.svg`}
+                src={`${process.env.REACT_APP_BASED_URL}/images/user.svg`}
                 className="h-[15px] w-[14px]"
               />
               <Typography className="text-sm font-semibold text-[#174483]">

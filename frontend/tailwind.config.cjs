@@ -7,7 +7,7 @@ module.exports = withMT({
     extend: {
       backgroundImage: (theme) => ({
         "custom-background":
-          "url('http://64.227.17.37:3000/imgs/background.svg')",
+          "url('https://64.227.17.37/images/background.svg')",
       }),
     },
   },

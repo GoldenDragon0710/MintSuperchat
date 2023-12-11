@@ -245,7 +245,7 @@ export function Chatbots() {
                                   className="flex cursor-pointer items-center"
                                 >
                                   <Avatar
-                                    src={`${process.env.REACT_APP_BASED_URL}/imgs/bot.svg`}
+                                    src={`${process.env.REACT_APP_BASED_URL}/images/bot.svg`}
                                     className="mx-2 h-5 w-6 rounded-none"
                                   />
                                   <Typography

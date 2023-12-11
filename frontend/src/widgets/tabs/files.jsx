@@ -85,7 +85,7 @@ export function FilesTab() {
         >
           <div className="flex flex-col items-center justify-center pb-6 pt-5">
             <Avatar
-              src={`${process.env.REACT_APP_BASED_URL}/imgs/upload.svg`}
+              src={`${process.env.REACT_APP_BASED_URL}/images/upload.svg`}
               className="m-2 h-auto w-[5.5rem]"
             />
             <p className="text-md font-normal text-[#00000080]">

@@ -228,7 +228,7 @@ export function AdminDatasets() {
                           >
                             <div className="flex items-center">
                               <Avatar
-                                src={`${process.env.REACT_APP_BASED_URL}/imgs/fileDataset.svg`}
+                                src={`${process.env.REACT_APP_BASED_URL}/images/fileDataset.svg`}
                                 className="mr-2 h-auto w-6"
                               />
                               <Typography className="text-[18px] font-medium text-[#00000080]">
@@ -265,7 +265,7 @@ export function AdminDatasets() {
                           >
                             <div className="flex items-center">
                               <Avatar
-                                src={`${process.env.REACT_APP_BASED_URL}/imgs/linkDataset.svg`}
+                                src={`${process.env.REACT_APP_BASED_URL}/images/linkDataset.svg`}
                                 className="mr-2 h-auto w-6"
                               />
                               <Typography className="text-[18px] font-medium text-[#00000080]">
@@ -302,7 +302,7 @@ export function AdminDatasets() {
                           >
                             <div className="flex items-center">
                               <Avatar
-                                src={`${process.env.REACT_APP_BASED_URL}/imgs/sitemapDataset.svg`}
+                                src={`${process.env.REACT_APP_BASED_URL}/images/sitemapDataset.svg`}
                                 className="mr-2 h-auto w-6"
                               />
                               <Typography className="text-[18px] font-medium text-[#00000080]">
