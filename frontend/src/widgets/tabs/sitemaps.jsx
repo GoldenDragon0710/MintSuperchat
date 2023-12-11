@@ -314,7 +314,7 @@ https://www.example.com/about
         </div>
       </div>
       <Typography className="mt-5 text-lg font-bold text-[#00000067]">
-        or upload CSV
+        or upload XML
       </Typography>
       <div className="flex w-full items-center justify-center p-5">
         <label

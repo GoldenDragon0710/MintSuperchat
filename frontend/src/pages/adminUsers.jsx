@@ -1,6 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { Typography, Button, Breadcrumbs } from "@material-tailwind/react";
+import {
+  Typography,
+  Button,
+  Breadcrumbs,
+  Chip,
+} from "@material-tailwind/react";
 import { HomeIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import { getUsers } from "@/actions/user";
 import { getChatbots } from "@/actions/chatbot";
@@ -29,6 +34,7 @@ export function AdminUsers() {
           id: userItem._id,
           username: userItem.username,
           email: userItem.email,
+          userType: userItem.userType,
           botCount: 0,
           phoneCount: 0,
         };
@@ -89,6 +95,17 @@ export function AdminUsers() {
                               {item.email}
                             </Typography>
                           </div>
+                          <Chip
+                            size="sm"
+                            variant="filled"
+                            value={item.userType == true ? "Admin" : "Client"}
+                            className={
+                              item.userType
+                                ? "bg-[#00BD851A] text-[#00BD85]"
+                                : "bg-[#0000001A] text-black"
+                            }
+                          />
+                          <Typography className="px-5">●</Typography>
                           <Typography className="text-base">
                             {item.phoneCount}{" "}
                             {item.phoneCount < 2 ? "Connection" : "Connections"}
