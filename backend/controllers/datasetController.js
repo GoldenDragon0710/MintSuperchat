@@ -279,10 +279,11 @@ const trainbot = async (req, res) => {
       })
     );
   }
-  if (xmlLinks) {
+  const xmlParsinglinks = JSON.parse(xmlLinks);
+  if (xmlParsinglinks) {
+    const sitemap = new Sitemapper();
     await Promise.all(
-      xmlLinks.map(async (link) => {
-        const sitemap = new Sitemapper();
+      xmlParsinglinks.map(async (link) => {
         sitemap.fetch(link).then(function (sites) {
           links = sites.sites;
         });
