@@ -100,6 +100,7 @@ https://www.example2.com/sitemap.xml
 
   const seperateLinks = () => {
     let links = multiLinksText;
+    let list = [];
     if (links == "") {
       return process.env.NO_DATA;
     }
@@ -109,10 +110,11 @@ https://www.example2.com/sitemap.xml
       if (!isXMLLink(item)) {
         return;
       }
+      list.push(item);
       flag++;
     });
     if (flag == arr.length) {
-      return arr;
+      return list;
     } else {
       return process.env.INCORRECT_LINK;
     }
