@@ -49,7 +49,7 @@ https://www.example2.com/sitemap.xml
       });
     }
     formData.append("botId", botId);
-    formData.append("xmlLink", urllist);
+    formData.append("xmlLinks", urllist);
     formData.append("datasetType", SITEMAPS_DATASETS);
     setLoading(true);
     dispatch(trainDatasets(formData))

@@ -31,7 +31,7 @@ export function AdminDatasets() {
   const navigate = useNavigate();
   const auth = useSelector((state) => state.auth.user);
   const dataset = useSelector((state) => state.dataset.datasets);
-  const curUserId = localStorage.getItem("curUserId");
+  const curUsername = localStorage.getItem("curUsername");
   const phoneTitle = localStorage.getItem("phoneTitle");
   const botId = localStorage.getItem("botId");
   const botTitle = localStorage.getItem("botTitle");
@@ -42,7 +42,7 @@ export function AdminDatasets() {
   const [trainable, setTrainable] = useState(true);
 
   useEffect(() => {
-    if (curUserId == null) {
+    if (curUsername == null) {
       navigate("/admin/users");
       return;
     }
@@ -128,7 +128,7 @@ export function AdminDatasets() {
             </a>
             <a href="/admin/phones">
               <Typography className="font-normal text-[#174483]">
-                {auth.username || "..."}
+                {curUsername || "..."}
               </Typography>
             </a>
             <a href="/admin/chatbots">
