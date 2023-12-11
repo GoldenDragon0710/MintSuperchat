@@ -25,17 +25,13 @@ const upload = multer({
       file.mimetype == "application/msword" ||
       file.mimetype ==
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      file.mimetype == "application/vnd.ms-excel" ||
-      file.mimetype ==
-        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      file.mimetype == "application/xml"
     ) {
       cb(null, true);
     } else {
       cb(null, false);
       return cb(
-        new Error(
-          "Only .pdf, .txt, .doc, .docx, .csv, .xls and .xlsx format allowed!"
-        )
+        new Error("Only .pdf, .txt, .doc, .docx, .xml format allowed!")
       );
     }
   },
@@ -45,7 +41,7 @@ router.post("/", datasetController.getDataset);
 router.post("/getsitemapURL", datasetController.getSitemapURL);
 router.post("/getsitemapXML", datasetController.getSitemapXML);
 router.post("/getQRCode", datasetController.getQRCode);
-router.post("/deleteDataset", datasetController.deleteDataset);
+router.post("/delete", datasetController.deleteDataset);
 router.post("/train", upload.array("files"), datasetController.trainbot);
 
 module.exports = router;

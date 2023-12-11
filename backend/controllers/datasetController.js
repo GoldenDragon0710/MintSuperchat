@@ -13,6 +13,7 @@ const BlockList = require("../models/Blocklist");
 const Dataset = require("../models/Dataset");
 const Phone = require("../models/Phone");
 const xlsx = require("xlsx");
+const parser = require("fast-xml-parser");
 const Papa = require("papaparse");
 const fs = require("fs");
 const puppeteer = require("puppeteer");
@@ -260,8 +261,34 @@ const deleteDataset = async (req, res) => {
 };
 
 const trainbot = async (req, res) => {
-  const { links, botId, datasetType } = req.body;
-  const files = req.files;
+  const { links, botId, datasetType, xmlLinks } = req.body;
+  const { files, xmlFiles } = req.files;
+  if (xmlFiles) {
+    await Promise.all(
+      xmlFiles.map(async (file) => {
+        // fetch("./mySurvey.xml")
+        //   .then((response) => response.text())
+        //   .then((data) => {
+        //     let parser = new DOMParser();
+        //     let xml = parser.parseFromString(data, "application/xml");
+        //     // Do something with the XML data
+        //   })
+        //   .catch((error) => {
+        //     console.log("Error:", error);
+        //   });
+      })
+    );
+  }
+  if (xmlLinks) {
+    await Promise.all(
+      xmlLinks.map(async (link) => {
+        const sitemap = new Sitemapper();
+        sitemap.fetch(link).then(function (sites) {
+          links = sites.sites;
+        });
+      })
+    );
+  }
   let vectorStore = [];
   let idlist = [];
   try {
@@ -289,20 +316,20 @@ const trainbot = async (req, res) => {
             loader = new loaders[ext]("uploads/" + file.filename);
           }
 
-          const contentLoaders = {
-            csv: async () => {
-              const directoryPath = "uploads/" + file.filename;
-              const fileData = await readFileAsync(directoryPath, "utf8");
-              const result = Papa.parse(fileData, { header: true });
-              return JSON.stringify(result.data);
-            },
-            xls: xlsContentLoader,
-            xlsx: xlsContentLoader,
-          };
+          // const contentLoaders = {
+          //   csv: async () => {
+          //     const directoryPath = "uploads/" + file.filename;
+          //     const fileData = await readFileAsync(directoryPath, "utf8");
+          //     const result = Papa.parse(fileData, { header: true });
+          //     return JSON.stringify(result.data);
+          //   },
+          //   xls: xlsContentLoader,
+          //   xlsx: xlsContentLoader,
+          // };
 
-          if (ext in contentLoaders) {
-            pageContent = await contentLoaders[ext]();
-          }
+          // if (ext in contentLoaders) {
+          //   pageContent = await contentLoaders[ext]();
+          // }
 
           if (loader) {
             const docs = await loader.load();

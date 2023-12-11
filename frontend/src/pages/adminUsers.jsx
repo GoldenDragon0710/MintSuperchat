@@ -105,12 +105,12 @@ export function AdminUsers() {
                                 : "bg-[#0000001A] text-black"
                             }
                           />
-                          <Typography className="px-5">●</Typography>
+                          <Typography className="px-5">{"●"}</Typography>
                           <Typography className="text-base">
                             {item.phoneCount}{" "}
                             {item.phoneCount < 2 ? "Connection" : "Connections"}
                           </Typography>
-                          <Typography className="px-5">●</Typography>
+                          <Typography className="px-5">{"●"}</Typography>
                           <Typography>
                             {item.botCount} {item.botCount < 2 ? "bot" : "bots"}
                           </Typography>

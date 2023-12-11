@@ -18,62 +18,19 @@ import { saveAs } from "file-saver";
 export function SitemapsTab() {
   const dispatch = useDispatch();
   const botId = localStorage.getItem("botId");
-  const datasets = useSelector((state) => state.dataset.datasets);
-  const xmlLinks = useSelector((state) => state.dataset.xmlLinks);
   const [loading, setLoading] = useState(false);
-  const [sitemapXMLLoading, setSitemapXMLLoading] = useState(false);
-  const [sitemapXML, setSitemapXML] = useState("");
   const [fileList, setFilelist] = useState([]);
   const [fileNameList, setFileNameList] = useState([]);
   const [multiLinksText, setMultiLinksText] = useState("");
-  const placeholder = `https://www.example.com
-https://www.example.com/about
+  const placeholder = `https://www.example1.com/sitemap.xml
+https://www.example2.com/sitemap.xml
 ...
   `;
-
-  useEffect(() => {
-    if (xmlLinks) {
-      let linkString = multiLinksText;
-      if (linkString != "") {
-        linkString += "\n";
-      }
-      xmlLinks.map((item, idx) => {
-        linkString += item;
-        if (idx != xmlLinks.length - 1) {
-          linkString += "\n";
-        }
-      });
-      setMultiLinksText(linkString);
-    }
-  }, [xmlLinks]);
-
-  const handleGetSitemapXML = () => {
-    if (isSitemapLink(sitemapXML) == false) {
-      s;
-      notification.warning({
-        message: "Please enter XML link correctly.",
-      });
-      return;
-    }
-    setSitemapXMLLoading(true);
-    const data = {
-      URL: sitemapXML,
-    };
-    dispatch(getsitemapXML(data))
-      .then(() => {
-        setSitemapXML("");
-
-        setSitemapXMLLoading(false);
-      })
-      .catch(() => {
-        setSitemapXMLLoading(false);
-      });
-  };
 
   const handleTrain = async () => {
     let urllist = seperateLinks();
     if (urllist == INCORRECT_LINK) {
-      notification.warning({ message: "Please enter correct links." });
+      notification.warning({ message: "Please enter correct xml links." });
       return;
     }
     if (urllist == NO_DATA) {
@@ -84,80 +41,20 @@ https://www.example.com/about
         urllist = [];
       }
     }
-    let list = [];
 
-    let samefiles = 0;
-    let samelinks = 0;
-    for (const file of fileList) {
-      if (datasets.includes(file.name) == false) {
-        await new Promise((resolve, reject) => {
-          Papa.parse(file, {
-            download: true,
-            header: false,
-            skipEmptyLines: true,
-            complete: (result) => {
-              if (result.data) {
-                for (let i = 0; i < result.data.length; i++) {
-                  let link = result.data[i][0];
-                  if (isLink(link) == false) {
-                    notification.warning({
-                      message: "File format is incorrectly.",
-                    });
-                    return;
-                  }
-                  if (link[link.length - 1] == "/") link = link.slice(0, -1);
-                  if (list.includes(link) == false) {
-                    if (datasets.includes(link) == false) {
-                      list.push(link);
-                    }
-                  } else {
-                    samelinks++;
-                  }
-                }
-                resolve();
-              } else {
-                notification.warning({ message: "Empty File." });
-                return;
-              }
-            },
-            error: (err) => {
-              console.log(err);
-              reject(err);
-            },
-          });
-        });
-      } else {
-        samefiles++;
-      }
+    const formData = new FormData();
+    if (fileList) {
+      fileList.map((file) => {
+        formData.append("files", file);
+      });
     }
-
-    if (urllist) {
-      for (let i = 0; i < urllist.length; i++) {
-        if (
-          datasets.includes(urllist[i]) == false ||
-          list.includes(urllist[i]) == false
-        ) {
-          list.push(urllist[i]);
-        } else {
-          samelinks++;
-        }
-      }
-    }
-    if (samefiles != 0) {
-      notification.warning({ message: `${samefiles} files are duplicated` });
-    }
-    if (samelinks != 0) {
-      notification.warning({ message: `${samelinks} links are duplicated` });
-    }
-
+    formData.append("botId", botId);
+    formData.append("xmlLink", urllist);
+    formData.append("datasetType", SITEMAPS_DATASETS);
     setLoading(true);
-    const data = {
-      links: list,
-      botId: botId,
-      datasetType: SITEMAPS_DATASETS,
-    };
-    dispatch(trainDatasets(data))
+    dispatch(trainDatasets(formData))
       .then(() => {
+        setMultiLinksText("");
         setFileNameList([]);
         setFilelist([]);
         setLoading(false);
@@ -165,16 +62,9 @@ https://www.example.com/about
       .catch(() => setLoading(false));
   };
 
-  const isLink = (str) => {
-    let linkRegex = /^(http:|https:)?\/\/[^\s/$.?#].[^\s]*$/;
+  const isXMLLink = (str) => {
+    let linkRegex = /^(http:|https:)?\/\/[^\s/$.?#].[^\s]*\.xml$/;
     return linkRegex.test(str);
-  };
-
-  const isSitemapLink = (link) => {
-    return (
-      link.startsWith("http://") ||
-      (link.startsWith("https://") && link.endsWith(".xml"))
-    );
   };
 
   const handleFileChange = (e) => {
@@ -204,22 +94,6 @@ https://www.example.com/about
     setFilelist(file_list);
   };
 
-  const generateCSVfile = () => {
-    const data = [
-      ["https://minbo.health"],
-      ["https://minbo.health/about"],
-      ["https://minbo.health/how-it-works"],
-    ];
-    // Convert data to CSV format
-    const csvContent = data.map((row) => row.join(",")).join("\n");
-
-    // Create a Blob object for the CSV file
-    const csvBlob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
-
-    // Save the file using FileSaver.js
-    saveAs(csvBlob, "Sitemap_template.csv");
-  };
-
   const handleMultiLinksText = (e) => {
     setMultiLinksText(e.target.value);
   };
@@ -232,7 +106,7 @@ https://www.example.com/about
     let arr = links.split("\n");
     let flag = 0;
     arr.map((item) => {
-      if (!isLink(item)) {
+      if (!isXMLLink(item)) {
         return;
       }
       flag++;
@@ -249,7 +123,7 @@ https://www.example.com/about
       <div className="m-1 flex w-full justify-end">
         <div
           className="flex cursor-pointer items-center"
-          onClick={generateCSVfile}
+          // onClick={generateXMLfile}
         >
           <Avatar
             src={`${process.env.REACT_APP_BASED_URL}/images/download.svg`}
@@ -278,39 +152,10 @@ https://www.example.com/about
             }}
           />
         </div>
-        <div className="mx-auto my-2 flex w-2/3 items-center justify-between">
-          <div className="mx-2 w-full rounded-lg border-[1px] border-[#000000] bg-[#00000013]">
-            <Input
-              onChange={(e) => setSitemapXML(e.target.value)}
-              value={sitemapXML}
-              label=""
-              placeholder="https://www.example.com/sitemap.xml"
-              className="h-full !border-0 !text-base !font-normal !text-black focus:border-transparent"
-              containerprops={{
-                className: "grid h-full",
-              }}
-              labelProps={{
-                className: "before:content-none after:content-none",
-              }}
-            />
-          </div>
-          <Button
-            onClick={handleGetSitemapXML}
-            className="h-[45px] w-[200px] rounded-full bg-black text-sm normal-case shadow-none hover:shadow-none"
-          >
-            {sitemapXMLLoading ? (
-              <ClipLoader
-                color={"#ffffff"}
-                loading={sitemapXMLLoading}
-                size={10}
-                cssOverride={{ height: "20px", width: "20px" }}
-              />
-            ) : (
-              <Typography className="text-sm font-medium text-white">
-                Load Sitemap
-              </Typography>
-            )}
-          </Button>
+        <div className="mx-auto my-2 flex w-full items-center">
+          <Typography className="text-sm font-normal italic text-black">
+            You can paste multiple links seperated by a new line
+          </Typography>
         </div>
       </div>
       <Typography className="mt-5 text-lg font-bold text-[#00000067]">
@@ -333,7 +178,7 @@ https://www.example.com/about
           <input
             id="dropzone-file2"
             type="file"
-            accept=".csv"
+            accept=".xml"
             onChange={handleFileChange}
             className="hidden"
             multiple

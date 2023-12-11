@@ -10,7 +10,6 @@ import { trainDatasets } from "@/actions/dataset";
 export function FilesTab() {
   const dispatch = useDispatch();
   const botId = localStorage.getItem("botId");
-  // const dataset = useSelector((state) => state.dataset.datasets);
   const [loading, setLoading] = useState(false);
   const [fileList, setFilelist] = useState([]);
   const [fileNameList, setFileNameList] = useState([]);
@@ -20,26 +19,15 @@ export function FilesTab() {
       notification.warning({ message: "There is no data to train on." });
       return;
     }
-    setLoading(true);
-    // let samefiles = 0;
     const formData = new FormData();
     if (fileList) {
       fileList.map((file) => {
         formData.append("files", file);
       });
     }
-    // for (let i = 0; i < fileList.length; i++) {
-    // if (dataset.includes(fileList[i].name) == false) {
-    // formData.append("files", fileList[i]);
-    //   } else {
-    //     samefiles++;
-    //   }
-    // }
-    // if (samefiles != 0) {
-    //   notification.warning({ message: `${samefiles} files are duplicated.` });
-    // }
     formData.append("botId", botId);
     formData.append("datasetType", FILES_DATASETS);
+    setLoading(true);
     dispatch(trainDatasets(formData))
       .then(() => {
         setFileNameList([]);
@@ -89,7 +77,8 @@ export function FilesTab() {
               className="m-2 h-auto w-[5.5rem]"
             />
             <p className="text-md font-normal text-[#00000080]">
-              Click to upload your files or drag and drop them here
+              Click to upload your files or drag and drop them here(PDF, Doc,
+              Docx, Txt)
             </p>
           </div>
           <input
