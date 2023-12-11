@@ -279,23 +279,25 @@ const trainbot = async (req, res) => {
       })
     );
   }
+  let trainlinks = links;
   const xmlParsinglinks = JSON.parse(xmlLinks);
   if (xmlParsinglinks) {
     const sitemap = new Sitemapper();
     await Promise.all(
       xmlParsinglinks.map(async (link) => {
         sitemap.fetch(link).then(function (sites) {
-          links = sites.sites;
+          trainlinks = sites.sites;
         });
       })
     );
   }
   let vectorStore = [];
   let idlist = [];
+  const trainfiles = files || xmlFiles;
   try {
-    if (files) {
+    if (trainfiles) {
       await Promise.all(
-        files.map(async (file) => {
+        trainfiles.map(async (file) => {
           const newRow = await Dataset.create({
             botId: botId,
             title: file.originalname,
@@ -347,9 +349,9 @@ const trainbot = async (req, res) => {
       );
     }
 
-    if (links) {
+    if (trainlinks) {
       await Promise.all(
-        links.map(async (link) => {
+        trainlinks.map(async (link) => {
           const newRow = await Dataset.create({
             botId: botId,
             title: link,
