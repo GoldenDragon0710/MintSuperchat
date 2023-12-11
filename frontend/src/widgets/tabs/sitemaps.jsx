@@ -41,7 +41,12 @@ https://www.example2.com/sitemap.xml
         urllist = [];
       }
     }
-
+    let list = [];
+    if (urllist) {
+      urllist.map((item) => {
+        list.push(item);
+      });
+    }
     const formData = new FormData();
     if (fileList) {
       fileList.map((file) => {
@@ -49,7 +54,7 @@ https://www.example2.com/sitemap.xml
       });
     }
     formData.append("botId", botId);
-    formData.append("xmlLinks", urllist);
+    formData.append("xmlLinks", list);
     formData.append("datasetType", SITEMAPS_DATASETS);
     setLoading(true);
     dispatch(trainDatasets(formData))
@@ -100,7 +105,6 @@ https://www.example2.com/sitemap.xml
 
   const seperateLinks = () => {
     let links = multiLinksText;
-    let list = [];
     if (links == "") {
       return process.env.NO_DATA;
     }
@@ -110,11 +114,10 @@ https://www.example2.com/sitemap.xml
       if (!isXMLLink(item)) {
         return;
       }
-      list.push(item);
       flag++;
     });
     if (flag == arr.length) {
-      return list;
+      return arr;
     } else {
       return process.env.INCORRECT_LINK;
     }

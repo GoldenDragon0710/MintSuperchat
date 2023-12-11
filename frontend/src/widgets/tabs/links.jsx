@@ -9,7 +9,6 @@ import { trainDatasets } from "@/actions/dataset";
 export function LinksTab() {
   const dispatch = useDispatch();
   const botId = localStorage.getItem("botId");
-  const datasets = useSelector((state) => state.dataset.datasets);
   const [loading, setLoading] = useState(false);
   const [multiLinksText, setMultiLinksText] = useState("");
   const placeholder = `https://www.example.com
@@ -27,24 +26,16 @@ https://www.example.com/about
         notification.warning({ message: "Please enter correct links." });
         return;
     }
-    setLoading(true);
     let list = [];
-    let samelinks = 0;
     urlList.map((item) => {
-      if (datasets.includes(item) == false) {
-        list.push(item);
-      } else {
-        samelinks++;
-      }
+      list.push(item);
     });
-    if (samelinks != 0) {
-      notification.warning({ message: `${samelinks} links are duplicated.` });
-    }
     const data = {
       links: list,
       botId: botId,
       datasetType: LINKS_DATASETS,
     };
+    setLoading(true);
     dispatch(trainDatasets(data))
       .then(() => setLoading(false))
       .catch(() => setLoading(false));
