@@ -122,17 +122,17 @@ export function Datasets() {
             </a>
             <a href="/chatbots">
               <Typography className="font-normal text-[#174483]">
-                {phoneTitle}
+                {phoneTitle || "..."}
               </Typography>
             </a>
             <a href="/datasets">
               <Typography className="font-normal text-[#174483]">
-                {botTitle}
+                {botTitle || "..."}
               </Typography>
             </a>
           </Breadcrumbs>
           <Typography className="mb-8 ml-4 text-5xl font-bold">
-            {botTitle}
+            {botTitle || "..."}
           </Typography>
           <div className="mx-3 mb-10 rounded-lg ">
             <Tabs value="TRAIN_TAB" id="parentTabId" className="h-full w-fit">

@@ -128,17 +128,17 @@ export function AdminDatasets() {
             </a>
             <a href="/admin/phones">
               <Typography className="font-normal text-[#174483]">
-                {auth && auth.username}
+                {auth.username || "..."}
               </Typography>
             </a>
             <a href="/admin/chatbots">
               <Typography className="font-normal text-[#174483]">
-                {phoneTitle}
+                {phoneTitle || "..."}
               </Typography>
             </a>
             <a href="/admin/datasets">
               <Typography className="font-normal text-[#174483]">
-                {botTitle}
+                {botTitle || "..."}
               </Typography>
             </a>
           </Breadcrumbs>

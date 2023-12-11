@@ -133,12 +133,12 @@ export function AdminBlocklist() {
             </a>
             <a href="/admin/phones">
               <Typography className="font-normal text-[#174483]">
-                {curUsername}
+                {curUsername || "..."}
               </Typography>
             </a>
             <a href="/admin/chatbots">
               <Typography className="font-normal text-[#174483]">
-                {phoneTitle}
+                {phoneTitle || "..."}
               </Typography>
             </a>
             <a href="/admin/blocklist">

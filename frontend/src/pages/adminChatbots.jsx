@@ -156,12 +156,12 @@ export function AdminChatbots() {
             </a>
             <a href="/admin/phones">
               <Typography className="font-normal text-[#174483]">
-                {curUsername}
+                {curUsername || "..."}
               </Typography>
             </a>
             <a href="/admin/chatbots">
               <Typography className="font-normal text-[#174483]">
-                {phoneTitle}
+                {phoneTitle || "..."}
               </Typography>
             </a>
           </Breadcrumbs>

@@ -66,7 +66,7 @@ export function AdminPhones() {
             </a>
             <a href="/admin/phones">
               <Typography className="font-normal text-[#174483]">
-                {curUsername}
+                {curUsername || "..."}
               </Typography>
             </a>
           </Breadcrumbs>

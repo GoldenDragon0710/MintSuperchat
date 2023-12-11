@@ -151,7 +151,7 @@ export function Chatbots() {
             </a>
             <a href="/chatbots">
               <Typography className="font-normal text-[#174483]">
-                {phoneTitle}
+                {phoneTitle || "..."}
               </Typography>
             </a>
           </Breadcrumbs>
