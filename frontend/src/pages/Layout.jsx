@@ -5,15 +5,16 @@ import { Navigate, Outlet } from "react-router-dom";
 export function Layout() {
   const auth = useSelector((state) => state.auth);
   const token = localStorage.getItem("token");
-  const [isView, setIsView] = useState(false);
 
-  useEffect(() => {
-    if (auth.user && auth.user.userType == process.env.isClient) {
-      setIsView(true);
-    }
-  }, []);
-
-  return <div>{token && isView ? <Outlet /> : <Navigate to="/login" />}</div>;
+  return (
+    <div>
+      {token ? (
+        auth.user && auth.user.userType == process.env.isClient && <Outlet />
+      ) : (
+        <Navigate to="/login" />
+      )}
+    </div>
+  );
 }
 
 export default Layout;
