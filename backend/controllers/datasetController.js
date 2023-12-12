@@ -354,7 +354,7 @@ const trainbot = async (req, res) => {
       await Promise.all(
         trainlinks.map(async (link) => {
           let linkRegex = /^(http:|https:)?\/\/[^\s/$.?#].[^\s]*$/;
-          if (!linkRegex.test(str)) {
+          if (!linkRegex.test(link)) {
             return res.status(400).json({
               message: "Invalid URL",
             });
