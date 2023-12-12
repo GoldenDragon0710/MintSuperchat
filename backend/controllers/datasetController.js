@@ -91,13 +91,16 @@ const getQRCode = async (req, res) => {
       if (message.body != "") {
         const senderTxt = message.from;
         const sender = senderTxt.split("@")[0];
-        const isblocked = await BlockList.findOne({ phone: sender });
-        if (isblocked == null) {
-          const userRow = await Phone.findOne({ phone: phone });
-          if (userRow) {
-            const userId = userRow._id.toString();
+        const row = await Phone.findOne({ phone: phone, delflag: false });
+        if (row) {
+          const phoneId = row._id.toString();
+          const isblocked = await BlockList.findOne({
+            phoneId: phoneId,
+            phone: sender,
+          });
+          if (isblocked == null) {
             const botRow = await Chatbot.findOne({
-              userId: { $in: userId },
+              phoneId: phoneId,
               active: true,
             });
             if (botRow) {
@@ -350,6 +353,12 @@ const trainbot = async (req, res) => {
     if (trainlinks) {
       await Promise.all(
         trainlinks.map(async (link) => {
+          let linkRegex = /^(http:|https:)?\/\/[^\s/$.?#].[^\s]*$/;
+          if (!linkRegex.test(str)) {
+            return res.status(400).json({
+              message: "Invalid URL",
+            });
+          }
           const newRow = await Dataset.create({
             botId: botId,
             title: link,

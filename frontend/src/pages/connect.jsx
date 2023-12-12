@@ -89,7 +89,7 @@ export function Connect() {
   return (
     <>
       <div className="flex h-full min-h-screen justify-center">
-        <div className="container mx-auto mb-10 h-screen pt-36">
+        <div className="container mx-auto mb-10 h-full pt-36">
           <Breadcrumbs className="my-2 bg-[#b0b7bb00]">
             <a href="/">
               <HomeIcon className="h-5 w-5 text-[#174483]" />

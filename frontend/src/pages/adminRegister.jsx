@@ -45,7 +45,13 @@ export function AdminRegister() {
       userType: isAdmin,
     };
     dispatch(register(data))
-      .then(() => setLoading(false))
+      .then(() => {
+        setUsername("");
+        setEmail("");
+        setPassword("");
+        setIsAdmin(false);
+        setLoading(false);
+      })
       .catch(() => setLoading(false));
   };
 

@@ -123,12 +123,43 @@ https://www.example2.com/sitemap.xml
     }
   };
 
+  const generateXMLfile = () => {
+    // Define XML data
+    const xmlData = `<?xml version="1.0" encoding="UTF-8"?>
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+   <url>
+      <loc>http://www.example.com/</loc>
+   </url>
+   <url>
+      <loc>http://www.example.com/about</loc>
+   </url>
+   <url>
+      <loc>http://www.example.com/service</loc>
+   </url>
+</urlset>
+`;
+
+    // Create a blob of the data
+    var fileToSave = new Blob([xmlData], {
+      type: "application/xml",
+      name: "sample.xml",
+    });
+
+    // Save the file
+    var fileURL = URL.createObjectURL(fileToSave);
+    var a = document.createElement("a");
+    a.href = fileURL;
+    a.download = "sample.xml";
+    document.body.appendChild(a);
+    a.click();
+  };
+
   return (
     <>
       <div className="m-1 flex w-full justify-end">
         <div
           className="flex cursor-pointer items-center"
-          // onClick={generateXMLfile}
+          onClick={generateXMLfile}
         >
           <Avatar
             src={`${process.env.REACT_APP_BASED_URL}/images/download.svg`}
