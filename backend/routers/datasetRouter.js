@@ -25,7 +25,10 @@ const upload = multer({
       file.mimetype == "application/msword" ||
       file.mimetype ==
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
-      file.mimetype == "application/xml"
+      file.mimetype == "application/xml" ||
+      file.mimetype == "text/xml" ||
+      file.mimetype == "application/rss+xml" ||
+      file.mimetype == "application/atom+xml"
     ) {
       cb(null, true);
     } else {

@@ -13,7 +13,7 @@ const BlockList = require("../models/Blocklist");
 const Dataset = require("../models/Dataset");
 const Phone = require("../models/Phone");
 const xlsx = require("xlsx");
-// const parser = require("fast-xml-parser");
+const xml2js = require("xml2js");
 const Papa = require("papaparse");
 const fs = require("fs");
 const puppeteer = require("puppeteer");
@@ -261,40 +261,53 @@ const deleteDataset = async (req, res) => {
 };
 
 const trainbot = async (req, res) => {
-  const { links, botId, datasetType, xmlLinks } = req.body;
-  const { files, xmlFiles } = req.files;
-  if (xmlFiles) {
-    await Promise.all(
-      xmlFiles.map(async (file) => {
-        // fetch("./mySurvey.xml")
-        //   .then((response) => response.text())
-        //   .then((data) => {
-        //     let parser = new DOMParser();
-        //     let xml = parser.parseFromString(data, "application/xml");
-        //     // Do something with the XML data
-        //   })
-        //   .catch((error) => {
-        //     console.log("Error:", error);
-        //   });
-      })
-    );
-  }
+  const { links, botId, datasetType } = req.body;
+  const files = req.files;
   let trainlinks = links;
-  const xmlParsinglinks = JSON.parse(xmlLinks);
-  if (xmlParsinglinks) {
-    const sitemap = new Sitemapper();
-    await Promise.all(
-      xmlParsinglinks.map(async (link) => {
-        sitemap.fetch(link).then(function (sites) {
-          trainlinks = sites.sites;
-        });
-      })
-    );
-  }
-  let vectorStore = [];
-  let idlist = [];
-  const trainfiles = files || xmlFiles;
+  let trainfiles = files;
+
   try {
+    if (datasetType == process.env.SITEMAPS_DATASETS) {
+      if (links) {
+        const xmlLinks = JSON.parse(links);
+        if (xmlLinks) {
+          const sitemap = new Sitemapper();
+          let linksPromises = xmlLinks.map((link) => sitemap.fetch(link));
+          let results = await Promise.all(linksPromises);
+
+          // Extract the sites from each result
+          trainlinks = results.flatMap((result) => result.sites);
+        }
+      }
+      if (files) {
+        const parser = new xml2js.Parser({ attrkey: "ATTR" });
+        await Promise.all(
+          files.map(async (file) => {
+            fs.readFile(`uploads/${file.filename}`, function (err, data) {
+              if (err) throw err;
+
+              // Parse XML File
+              parser.parseString(data, function (error, result) {
+                if (error === null) {
+                  trainlinks = result.urlset.url.map(
+                    (urlItem) => urlItem.loc[0]
+                  );
+                } else {
+                  return res.status(400).json({
+                    message:
+                      "File format error. Please refer the template file",
+                  });
+                }
+              });
+            });
+          })
+        );
+      }
+    }
+
+    let vectorStore = [];
+    let idlist = [];
+
     if (trainfiles) {
       await Promise.all(
         trainfiles.map(async (file) => {
@@ -318,21 +331,6 @@ const trainbot = async (req, res) => {
           if (ext in loaders) {
             loader = new loaders[ext]("uploads/" + file.filename);
           }
-
-          // const contentLoaders = {
-          //   csv: async () => {
-          //     const directoryPath = "uploads/" + file.filename;
-          //     const fileData = await readFileAsync(directoryPath, "utf8");
-          //     const result = Papa.parse(fileData, { header: true });
-          //     return JSON.stringify(result.data);
-          //   },
-          //   xls: xlsContentLoader,
-          //   xlsx: xlsContentLoader,
-          // };
-
-          // if (ext in contentLoaders) {
-          //   pageContent = await contentLoaders[ext]();
-          // }
 
           if (loader) {
             const docs = await loader.load();
