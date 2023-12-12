@@ -56,7 +56,7 @@ const update = async (req, res) => {
 // @desc     delete phone
 const deleteOne = async (req, res) => {
   try {
-    const { id } = req.body;
+    const { id, userId } = req.body;
     await Phone.deleteOne({ _id: id });
     const botRows = await Chatbot.find({ phoneId: id });
     const botIds = [];
@@ -84,7 +84,7 @@ const deleteOne = async (req, res) => {
       }
     }
 
-    const rows = await Phone.find();
+    const rows = await Phone.find({ userId: userId });
     return res.status(200).json({ data: rows });
   } catch (err) {
     console.log(err);

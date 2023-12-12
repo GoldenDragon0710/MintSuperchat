@@ -28,7 +28,8 @@ export const getPhones = (data) => async (dispatch) => {
 export const deletePhone = (data) => async (dispatch) => {
   try {
     const res = await api.post("/phone/delete", data);
-    notification.success({ message: res.data.message });
+    dispatch({ type: GET_PHONES, payload: res.data.data });
+    notification.success({ message: "Successfully deleted" });
   } catch (err) {
     notification.warning({ message: err.response.data.message });
     throw err;

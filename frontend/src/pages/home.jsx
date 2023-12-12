@@ -26,7 +26,7 @@ export function Home() {
   }, []);
 
   const handleDeletePhone = (id) => {
-    const data = { id: id };
+    const data = { id: id, userId: auth._id };
     dispatch(deletePhone(data));
   };
 

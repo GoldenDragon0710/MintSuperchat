@@ -33,7 +33,7 @@ export function AdminPhones() {
   }, []);
 
   const handleDeletePhone = (id) => {
-    const data = { id: id };
+    const data = { id: id, userId: curUserId };
     dispatch(deletePhone(data));
   };
 
