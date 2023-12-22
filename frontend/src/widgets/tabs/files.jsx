@@ -78,13 +78,13 @@ export function FilesTab() {
             />
             <p className="text-md font-normal text-[#00000080]">
               Click to upload your files or drag and drop them here(PDF, Doc,
-              Docx, Txt)
+              Docx, Txt, CSV, Xls, Xlsx)
             </p>
           </div>
           <input
             id="dropzone-file1"
             type="file"
-            accept=".doc,.docx,.pdf,.txt"
+            accept=".doc,.docx,.pdf,.txt, .csv, .xlsx, .xls"
             onChange={handleFileChanger}
             className="hidden"
             multiple

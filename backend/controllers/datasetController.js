@@ -5,6 +5,7 @@ const { PineconeStore } = require("langchain/vectorstores/pinecone");
 const { PineconeClient } = require("@pinecone-database/pinecone");
 const { PDFLoader } = require("langchain/document_loaders/fs/pdf");
 const { DocxLoader } = require("langchain/document_loaders/fs/docx");
+const { CSVLoader } = require("langchain/document_loaders/fs/csv");
 const { ChatOpenAI } = require("langchain/chat_models/openai");
 const { TextLoader } = require("langchain/document_loaders/fs/text");
 const { Document } = require("langchain/document");
@@ -329,6 +330,9 @@ const trainbot = async (req, res) => {
             doc: DocxLoader,
             docx: DocxLoader,
             txt: TextLoader,
+            csv: CSVLoader,
+            xlsx: CSVLoader,
+            xls: CSVLoader,
           };
 
           if (ext in loaders) {

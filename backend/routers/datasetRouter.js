@@ -22,6 +22,9 @@ const upload = multer({
       file.mimetype == "application/pdf" ||
       file.mimetype == "text/plain" ||
       file.mimetype == "text/csv" ||
+      file.mimetype == "application/vnd.ms-excel" ||
+      file.mimetype ==
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" ||
       file.mimetype == "application/msword" ||
       file.mimetype ==
         "application/vnd.openxmlformats-officedocument.wordprocessingml.document" ||
@@ -34,7 +37,9 @@ const upload = multer({
     } else {
       cb(null, false);
       return cb(
-        new Error("Only .pdf, .txt, .doc, .docx, .xml format allowed!")
+        new Error(
+          "Only .pdf, .txt, .doc, .docx, .csv, .xls, .xlsx, .xml format allowed!"
+        )
       );
     }
   },
