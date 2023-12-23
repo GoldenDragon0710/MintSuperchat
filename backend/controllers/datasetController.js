@@ -330,9 +330,6 @@ const trainbot = async (req, res) => {
             doc: DocxLoader,
             docx: DocxLoader,
             txt: TextLoader,
-            csv: CSVLoader,
-            xlsx: CSVLoader,
-            xls: CSVLoader,
           };
 
           if (ext in loaders) {
@@ -342,6 +339,20 @@ const trainbot = async (req, res) => {
           if (loader) {
             const docs = await loader.load();
             pageContent = docs[0].pageContent;
+          }
+
+          if (ext === "csv") {
+            loader = new CSVLoader("uploads/" + file.filename);
+            const docs = await loader.load();
+            if (docs) {
+              docs.map((item) => {
+                pageContent += item.pageContent + ", ";
+              });
+            }
+          }
+
+          if (ext === "xls" || ext === "xlsx") {
+            pageContent = await xlsContentLoader(file);
           }
 
           if (pageContent) {
@@ -431,7 +442,7 @@ const trainbot = async (req, res) => {
   }
 };
 
-async function xlsContentLoader() {
+async function xlsContentLoader(file) {
   const workbook = xlsx.readFile("uploads/" + file.filename);
   const workbookSheet = workbook.SheetNames;
   const res = xlsx.utils.sheet_to_json(workbook.Sheets[workbookSheet[0]]);
