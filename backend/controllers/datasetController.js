@@ -220,13 +220,13 @@ const getReply = async (message, namespaceId) => {
         Answer:`;
   const chat = new ChatOpenAI({
     modelName: "gpt-4",
-    temperature: 0,
+    temperature: 0.2,
     openAIApiKey: process.env.OPENAI_API_KEY,
   });
 
   const chain = ConversationalRetrievalQAChain.fromLLM(
     chat,
-    vectorStore.asRetriever(),
+    vectorStore.asRetriever(10),
     {
       qaTemplate: QA_PROMPT,
       questionGeneratorTemplate: CONDENSE_PROMPT,
@@ -346,9 +346,10 @@ const trainbot = async (req, res) => {
             const docs = await loader.load();
             if (docs) {
               docs.map((item) => {
-                pageContent += item.pageContent + ", ";
+                item.metadata["id"] = newRow._id.toString();
               });
             }
+            vectorStore = [...docs];
           }
 
           if (ext === "xls" || ext === "xlsx") {
