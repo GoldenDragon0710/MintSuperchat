@@ -226,7 +226,7 @@ const getReply = async (message, namespaceId) => {
 
   const chain = ConversationalRetrievalQAChain.fromLLM(
     chat,
-    vectorStore.asRetriever(10),
+    vectorStore.asRetriever(20),
     {
       qaTemplate: QA_PROMPT,
       questionGeneratorTemplate: CONDENSE_PROMPT,
